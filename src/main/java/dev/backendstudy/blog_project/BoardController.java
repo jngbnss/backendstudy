@@ -1,7 +1,11 @@
 package dev.backendstudy.blog_project;
 
 import dev.backendstudy.blog_project.dto.BoardRequestDto;
+import dev.backendstudy.blog_project.dto.BoardResponseDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +21,15 @@ public class BoardController {
         //2. 서비스의 save 로직을 호출하여 DB에 저장
         //3. 저장된 게시글의 ID를 반환
         return boardService.save(requestDto);
+    }
+    @GetMapping("/api/board")
+    public List<BoardResponseDto> getAllBoard(){
+        return boardService.findAll();
+    }
+
+    @GetMapping("/api/boards/{id}")
+    public BoardResponseDto getBoard(@PathVariable Long id){
+        return boardService.findById(id);
     }
 }
 // 리퀘스트 바디로 제이슨을 풀어서 자바로 넘김

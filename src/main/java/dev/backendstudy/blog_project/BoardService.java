@@ -1,6 +1,9 @@
 package dev.backendstudy.blog_project;
 
 import dev.backendstudy.blog_project.dto.BoardRequestDto;
+import dev.backendstudy.blog_project.dto.BoardResponseDto;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,5 +22,18 @@ public class BoardService {
                 requestDto.getWriter()
         );
         return boardRepository.save(board).getId();
+    }
+    @Transactional(readOnly = true)
+    public List<BoardResponseDto> findAll(){
+        return boardRepository.findAll().stream()
+                .map(BoardResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public BoardResponseDto findById(Long id){
+        Board board = boardRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("해당 게시글이 없습니다. id = "+id));
+        return new BoardResponseDto(board);
     }
 }
