@@ -76,4 +76,19 @@ class BoardServiceTest {
         assertThat(result.getTitle()).isEqualTo("수정된 제목");
         assertThat(result.getContent()).isEqualTo("수정된 내용");
     }
+    @Test
+    @DisplayName("게시글 삭제 성공 시, 다시 조회하면 예외가 발생해야 한다")
+    void delete() {
+        // given (데이터 저장)
+        BoardRequestDto requestDto = new BoardRequestDto("삭제할 제목", "내용", "작성자");
+        Long savedId = boardService.save(requestDto);
+
+        // when (삭제 실행)
+        boardService.delete(savedId);
+
+        // then (조회 시 예외 발생 확인)
+        assertThatThrownBy(() -> boardService.findById(savedId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("해당 게시글이 없습니다.");
+    }
 }

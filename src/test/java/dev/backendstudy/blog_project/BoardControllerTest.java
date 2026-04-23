@@ -1,5 +1,6 @@
 package dev.backendstudy.blog_project;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -81,5 +82,19 @@ class BoardControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk());
+    }
+    @Test
+    @DisplayName("DELETE /api/boards/{id}: 게시글 삭제에 성공한다")
+    void deleteBoard() throws Exception {
+        // given (DB에 테스트 데이터 직접 삽입)
+        Board saved = boardRepository.save(new Board("삭제용 제목", "내용", "작성자"));
+
+        // when & then
+        mockMvc.perform(delete("/api/boards/" + saved.getId()))
+                .andExpect(status().isOk()); // 성공 시 200 OK 반환 확인
+
+        // 추가 검증: 실제로 DB에서 사라졌는지 확인
+        boolean exists = boardRepository.existsById(saved.getId());
+        assertThat(exists).isFalse();
     }
 }
