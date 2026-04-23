@@ -41,7 +41,7 @@ public class BoardController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody BoardUpdateDto requestDto){
+    public ResponseEntity<Void> updateBoard(@PathVariable Long id, @RequestBody BoardUpdateDto requestDto){
         boardService.update(id,requestDto);
         //수정 완료 후 성공 응답 (200 OK)반환
         return ResponseEntity.ok().build();
