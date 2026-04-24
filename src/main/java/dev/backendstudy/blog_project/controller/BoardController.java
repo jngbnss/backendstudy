@@ -1,8 +1,9 @@
-package dev.backendstudy.blog_project;
+package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.dto.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.BoardUpdateDto;
+import dev.backendstudy.blog_project.service.BoardService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

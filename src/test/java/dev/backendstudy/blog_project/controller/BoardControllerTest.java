@@ -1,4 +1,4 @@
-package dev.backendstudy.blog_project;
+package dev.backendstudy.blog_project.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.backendstudy.blog_project.dto.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.BoardUpdateDto;
+import dev.backendstudy.blog_project.entity.Board;
+import dev.backendstudy.blog_project.repository.BoardRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
