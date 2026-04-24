@@ -1,0 +1,25 @@
+<form id="updateForm">
+  <input type="text" id="title" th:value="${board.title}"><br>
+  <textarea id="content" th:text="${board.content}"></textarea><br>
+  <button type="button" th:onclick="updateBoard([[${board.id}]])">수정 완료</button>
+</form>
+
+<script>
+  function updateBoard(id) {
+      const data = {
+          title: document.getElementById('title').value,
+          content: document.getElementById('content').value
+      };
+
+      fetch(`/api/boards/${id}`, {
+          method: 'PUT', // 이미 만드신 Update API가 PUT이라면 맞춰주세요
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+      }).then(res => {
+          if (res.ok) {
+              alert("수정 완료!");
+              location.href = "/boards/" + id;
+          }
+      });
+  }
+</script>
