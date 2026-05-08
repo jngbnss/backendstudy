@@ -3,9 +3,9 @@ package dev.backendstudy.blog_project.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import dev.backendstudy.blog_project.dto.BoardRequestDto;
-import dev.backendstudy.blog_project.dto.BoardResponseDto;
-import dev.backendstudy.blog_project.dto.BoardUpdateDto;
+import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
+import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
+import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

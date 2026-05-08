@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.backendstudy.blog_project.dto.ReplyRequestDto;
+import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
 import dev.backendstudy.blog_project.service.ReplyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

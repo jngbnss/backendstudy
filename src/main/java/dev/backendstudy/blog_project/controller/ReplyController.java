@@ -1,6 +1,6 @@
 package dev.backendstudy.blog_project.controller;
 
-import dev.backendstudy.blog_project.dto.ReplyRequestDto;
+import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
 import dev.backendstudy.blog_project.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

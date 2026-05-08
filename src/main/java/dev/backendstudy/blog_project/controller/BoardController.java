@@ -1,8 +1,8 @@
 package dev.backendstudy.blog_project.controller;
 
-import dev.backendstudy.blog_project.dto.BoardRequestDto;
-import dev.backendstudy.blog_project.dto.BoardResponseDto;
-import dev.backendstudy.blog_project.dto.BoardUpdateDto;
+import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
+import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
+import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import dev.backendstudy.blog_project.service.BoardService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

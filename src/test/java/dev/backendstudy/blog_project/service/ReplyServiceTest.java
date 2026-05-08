@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import dev.backendstudy.blog_project.dto.ReplyRequestDto;
+import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
 import dev.backendstudy.blog_project.entity.Board;
 import dev.backendstudy.blog_project.entity.Reply;
 import dev.backendstudy.blog_project.repository.BoardRepository;

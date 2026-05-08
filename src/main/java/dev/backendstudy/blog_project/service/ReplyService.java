@@ -1,6 +1,6 @@
 package dev.backendstudy.blog_project.service;
 
-import dev.backendstudy.blog_project.dto.ReplyRequestDto;
+import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
 import dev.backendstudy.blog_project.entity.Board;
 import dev.backendstudy.blog_project.entity.Reply;
 import dev.backendstudy.blog_project.repository.BoardRepository;

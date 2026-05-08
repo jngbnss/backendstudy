@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.backendstudy.blog_project.dto.BoardRequestDto;
-import dev.backendstudy.blog_project.dto.BoardUpdateDto;
+import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
+import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import dev.backendstudy.blog_project.entity.Board;
 import dev.backendstudy.blog_project.repository.BoardRepository;
 import org.junit.jupiter.api.DisplayName;

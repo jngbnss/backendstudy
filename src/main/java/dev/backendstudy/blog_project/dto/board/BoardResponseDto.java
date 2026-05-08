@@ -1,5 +1,6 @@
-package dev.backendstudy.blog_project.dto;
+package dev.backendstudy.blog_project.dto.board;
 
+import dev.backendstudy.blog_project.dto.reply.ReplyResponseDto;
 import dev.backendstudy.blog_project.entity.Board;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package dev.backendstudy.blog_project.dto;
+package dev.backendstudy.blog_project.dto.board;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

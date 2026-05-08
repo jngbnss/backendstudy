@@ -1,4 +1,4 @@
-package dev.backendstudy.blog_project.dto;
+package dev.backendstudy.blog_project.dto.reply;
 
 import dev.backendstudy.blog_project.entity.Reply;
 import java.time.LocalDateTime;
