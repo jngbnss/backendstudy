@@ -11,19 +11,15 @@ public class BoardResponseDto {
     private String title;
     private String content;
     private String writer;
-
-    // 1. 타입을 CommentRequestDto에서 CommentResponseDto로 변경해야 합니다.
-    private List<CommentResponseDto> comments;
+    private List<ReplyResponseDto> replies;
 
     public BoardResponseDto(Board board) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.content = board.getContent();
         this.writer = board.getWriter();
-
-        // 2. 이제 타입이 일치하므로 정상적으로 변환됩니다.
-        this.comments = board.getComments().stream()
-                .map(CommentResponseDto::new)
+        this.replies = board.getReplies().stream()
+                .map(ReplyResponseDto::new)
                 .collect(Collectors.toList());
     }
 }

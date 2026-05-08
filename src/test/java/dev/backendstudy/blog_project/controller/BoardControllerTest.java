@@ -1,8 +1,12 @@
 package dev.backendstudy.blog_project.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.backendstudy.blog_project.dto.BoardRequestDto;
@@ -19,83 +23,72 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureMockMvc // MockMvc를 생성하고 구성해주는 어노테이션
+@AutoConfigureMockMvc
 @Transactional
 class BoardControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper; // 객체를 JSON 문자열로 변환하기 위해 필요
+    private ObjectMapper objectMapper;
 
     @Autowired
     private BoardRepository boardRepository;
 
     @Test
-    @DisplayName("POST /api/boards: 게시글 생성에 성공한다")
+    @DisplayName("create board")
     void createBoard() throws Exception {
-        // given
-        BoardRequestDto requestDto = new BoardRequestDto("컨트롤러 제목", "컨트롤러 내용", "작성자");
-        String json = objectMapper.writeValueAsString(requestDto); // DTO를 JSON으로 변환
+        BoardRequestDto requestDto = new BoardRequestDto("controller title", "controller content", "writer");
+        String json = objectMapper.writeValueAsString(requestDto);
 
-        // when & then
         mockMvc.perform(post("/api/boards")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isCreated()); // 201 Created 응답 확인
+                .andExpect(status().isCreated());
     }
 
     @Test
-    @DisplayName("GET /api/boards: 전체 게시글을 조회한다")
+    @DisplayName("get all boards")
     void getAllBoards() throws Exception {
-        // given
-        boardRepository.save(new Board("제목1", "내용1", "작성자1"));
+        boardRepository.save(new Board("title1", "content1", "writer"));
 
-        // when & then
         mockMvc.perform(get("/api/boards"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("제목1"));
+                .andExpect(jsonPath("$[0].title").value("title1"));
     }
 
     @Test
-    @DisplayName("GET /api/boards/{id}: 특정 게시글 조회에 성공한다")
+    @DisplayName("get board")
     void getBoard() throws Exception {
-        // given
-        Board saved = boardRepository.save(new Board("조회 제목", "내용", "작성자"));
+        Board saved = boardRepository.save(new Board("read title", "content", "writer"));
 
-        // when & then
         mockMvc.perform(get("/api/boards/" + saved.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("조회 제목"))
-                .andExpect(jsonPath("$.content").value("내용"));
+                .andExpect(jsonPath("$.title").value("read title"))
+                .andExpect(jsonPath("$.content").value("content"));
     }
 
     @Test
-    @DisplayName("PUT /api/boards/{id}: 게시글 수정에 성공한다")
+    @DisplayName("update board")
     void updateBoard() throws Exception {
-        // given
-        Board saved = boardRepository.save(new Board("수정 전", "내용", "작성자"));
-        BoardUpdateDto updateDto = new BoardUpdateDto("수정 후", "새 내용");
+        Board saved = boardRepository.save(new Board("old title", "content", "writer"));
+        BoardUpdateDto updateDto = new BoardUpdateDto("updated title", "updated content");
         String json = objectMapper.writeValueAsString(updateDto);
 
-        // when & then
         mockMvc.perform(put("/api/boards/" + saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk());
     }
+
     @Test
-    @DisplayName("DELETE /api/boards/{id}: 게시글 삭제에 성공한다")
+    @DisplayName("delete board")
     void deleteBoard() throws Exception {
-        // given (DB에 테스트 데이터 직접 삽입)
-        Board saved = boardRepository.save(new Board("삭제용 제목", "내용", "작성자"));
+        Board saved = boardRepository.save(new Board("delete title", "content", "writer"));
 
-        // when & then
         mockMvc.perform(delete("/api/boards/" + saved.getId()))
-                .andExpect(status().isOk()); // 성공 시 200 OK 반환 확인
+                .andExpect(status().isOk());
 
-        // 추가 검증: 실제로 DB에서 사라졌는지 확인
         boolean exists = boardRepository.existsById(saved.getId());
         assertThat(exists).isFalse();
     }

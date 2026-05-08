@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.backendstudy.blog_project.dto.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.BoardUpdateDto;
-import dev.backendstudy.blog_project.repository.BoardRepository;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,81 +14,65 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@Transactional // 테스트 완료 후 DB를 자동으로 롤백해줘서 반복 테스트가 가능해요.
+@Transactional
 class BoardServiceTest {
-
     @Autowired
     private BoardService boardService;
 
-    @Autowired
-    private BoardRepository boardRepository;
-
     @Test
-    @DisplayName("게시글을 저장하면 ID가 반환되고 조회가 가능해야 한다")
+    @DisplayName("save board")
     void save() {
-        // given
-        BoardRequestDto requestDto = new BoardRequestDto("테스트 제목", "테스트 내용", "작성자");
+        BoardRequestDto requestDto = new BoardRequestDto("test title", "test content", "writer");
 
-        // when
         Long savedId = boardService.save(requestDto);
 
-        // then
         BoardResponseDto result = boardService.findById(savedId);
-        assertThat(result.getTitle()).isEqualTo("테스트 제목");
-        assertThat(result.getWriter()).isEqualTo("작성자");
+        assertThat(result.getTitle()).isEqualTo("test title");
+        assertThat(result.getWriter()).isEqualTo("writer");
     }
 
     @Test
-    @DisplayName("전체 게시글 목록을 조회할 수 있다")
+    @DisplayName("find all boards")
     void findAll() {
-        // given
-        boardService.save(new BoardRequestDto("제목1", "내용1", "작성자1"));
-        boardService.save(new BoardRequestDto("제목2", "내용2", "작성자2"));
+        boardService.save(new BoardRequestDto("title1", "content1", "writer"));
+        boardService.save(new BoardRequestDto("title2", "content2", "writer"));
 
-        // when
         List<BoardResponseDto> all = boardService.findAll();
 
-        // then
         assertThat(all.size()).isGreaterThanOrEqualTo(2);
     }
 
     @Test
-    @DisplayName("존재하지 않는 ID로 조회하면 예외가 발생한다")
+    @DisplayName("find by id exception")
     void findById_exception() {
-        // when & then
         assertThatThrownBy(() -> boardService.findById(999L))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("해당 게시글이 없습니다.");
+                .hasMessageContaining("Board not found.");
     }
 
     @Test
-    @DisplayName("게시글 수정 시 변경 감지(Dirty Checking)가 작동해야 한다")
+    @DisplayName("update board")
     void update() {
-        // given
-        Long savedId = boardService.save(new BoardRequestDto("원래 제목", "원래 내용", "작성자"));
-        BoardUpdateDto updateDto = new BoardUpdateDto("수정된 제목", "수정된 내용");
+        Long savedId = boardService.save(new BoardRequestDto("old title", "old content", "writer"));
+        BoardUpdateDto updateDto = new BoardUpdateDto("updated title", "updated content");
 
-        // when
         boardService.update(savedId, updateDto);
 
-        // then
         BoardResponseDto result = boardService.findById(savedId);
-        assertThat(result.getTitle()).isEqualTo("수정된 제목");
-        assertThat(result.getContent()).isEqualTo("수정된 내용");
+        assertThat(result.getTitle()).isEqualTo("updated title");
+        assertThat(result.getContent()).isEqualTo("updated content");
     }
+
     @Test
-    @DisplayName("게시글 삭제 성공 시, 다시 조회하면 예외가 발생해야 한다")
+    @DisplayName("delete board")
     void delete() {
-        // given (데이터 저장)
-        BoardRequestDto requestDto = new BoardRequestDto("삭제할 제목", "내용", "작성자");
+        BoardRequestDto requestDto = new BoardRequestDto("delete title", "content", "writer");
         Long savedId = boardService.save(requestDto);
 
-        // when (삭제 실행)
         boardService.delete(savedId);
 
-        // then (조회 시 예외 발생 확인)
         assertThatThrownBy(() -> boardService.findById(savedId))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("해당 게시글이 없습니다.");
+                .hasMessageContaining("Board not found.");
     }
 }

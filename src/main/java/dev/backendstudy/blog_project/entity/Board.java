@@ -1,6 +1,5 @@
 package dev.backendstudy.blog_project.entity;
 
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,35 +14,36 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
-@NoArgsConstructor // 파라미터가 없는 기본 자동 생성자 자동생성
-@EntityListeners(AuditingEntityListener.class) // 생성/ 수정 시간 자동 기록을 위해 필요
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Board {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // DB의 auto increment 사용
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100) // 제목은 필수 , 길이는 100자 제한
+    @Column(nullable = false, length = 100)
     private String title;
-    @Column(columnDefinition = "TEXT", nullable = false)// 내용은 길 수 있으므로
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
+
     @Column(nullable = false)
     private String writer;
+
     @CreatedDate
-    @Column(updatable = false) // 생성 시간은 수정되지 않도록 설정
+    @Column(updatable = false)
     private LocalDateTime createdAt;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "board",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
-    //게시글 생성을 위한 생성자
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reply> replies = new ArrayList<>();
 
     public Board(String title, String content, String writer) {
         this.title = title;
@@ -51,10 +51,8 @@ public class Board {
         this.writer = writer;
     }
 
-    //게시글 수정을 위한 메서드
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        //setter 대신 비즈니스 메서드 사용권장
     }
 }

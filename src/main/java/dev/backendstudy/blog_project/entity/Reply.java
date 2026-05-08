@@ -1,6 +1,14 @@
 package dev.backendstudy.blog_project.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Comment {
+public class Reply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,29 +39,22 @@ public class Comment {
     private LocalDateTime createdAt;
 
     @Builder
-    public Comment(String content, String writer, Board board) {
+    public Reply(String content, String writer, Board board) {
         this.content = content;
         this.writer = writer;
         if (board != null) {
-            setBoard(board); // 생성 시점에 연관관계 편의 메서드 호출
+            setBoard(board);
         }
     }
 
-    /**
-     * 댓글 수정 (더티 체킹 활용)
-     */
     public void update(String content) {
         this.content = content;
     }
 
-    /**
-     * 연관관계 편의 메서드
-     */
     public void setBoard(Board board) {
         this.board = board;
-        // 게시글의 댓글 목록에 나(this)를 추가하여 양방향 정합성 유지
-        if (!board.getComments().contains(this)) {
-            board.getComments().add(this);
+        if (!board.getReplies().contains(this)) {
+            board.getReplies().add(this);
         }
     }
 }

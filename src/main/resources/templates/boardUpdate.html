@@ -1,8 +1,24 @@
-<form id="updateForm">
-  <input type="text" id="title" th:value="${board.title}"><br>
-  <textarea id="content" th:text="${board.content}"></textarea><br>
-  <button type="button" th:onclick="updateBoard([[${board.id}]])">수정 완료</button>
-</form>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Board</title>
+  <style>
+    .container { max-width: 800px; margin: 50px auto; font-family: Arial, sans-serif; }
+    input[type="text"], textarea { width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 12px; }
+    textarea { height: 220px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; background: #007bff; color: white; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Update Board</h1>
+  <form id="updateForm">
+    <input type="text" id="title" th:value="${board.title}">
+    <textarea id="content" th:text="${board.content}"></textarea>
+    <button type="button" class="btn" th:onclick="updateBoard([[${board.id}]])">Update</button>
+  </form>
+</div>
 
 <script>
   function updateBoard(id) {
@@ -12,14 +28,18 @@
       };
 
       fetch(`/api/boards/${id}`, {
-          method: 'PUT', // 이미 만드신 Update API가 PUT이라면 맞춰주세요
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
       }).then(res => {
           if (res.ok) {
-              alert("수정 완료!");
-              location.href = "/boards/" + id;
+              alert('Updated.');
+              location.href = '/boards/' + id;
+          } else {
+              alert('Update failed.');
           }
       });
   }
 </script>
+</body>
+</html>
