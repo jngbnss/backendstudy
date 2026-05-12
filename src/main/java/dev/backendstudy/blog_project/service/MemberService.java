@@ -1,7 +1,9 @@
 package dev.backendstudy.blog_project.service;
 
 import dev.backendstudy.blog_project.dto.member.MemberLoginRequestDto;
+import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
 import dev.backendstudy.blog_project.dto.member.MemberSignupRequestDto;
+import dev.backendstudy.blog_project.dto.member.MemberUpdateRequestDto;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,23 @@ public class MemberService {
         }
         return member;
 
+    }
+
+    //회원조회
+    public MemberResponseDto findMyInfo(Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        return new MemberResponseDto(member);
+    }
+
+    // 회원수정
+    @Transactional
+    public void updateMyInfo(Long memberId, MemberUpdateRequestDto requestDto){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        member.updateUsername(requestDto.getUsername());
     }
 
 

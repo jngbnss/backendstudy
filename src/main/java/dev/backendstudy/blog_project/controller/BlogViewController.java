@@ -1,6 +1,7 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.service.BoardService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,25 +16,26 @@ public class BlogViewController {
     private final BoardService boardService;
 
     @GetMapping
-    public String getBoardList(Model model) {
+    public String getBoardList(Model model, HttpSession session) {
         model.addAttribute("boards", boardService.findAll());
-        return "boardList";
+        model.addAttribute("isLoggedIn", session.getAttribute("loginMemberId") != null);
+        return "boards/boardList";
     }
 
     @GetMapping("/{boardId}")
     public String getBoardPage(@PathVariable Long boardId, Model model) {
         model.addAttribute("board", boardService.findById(boardId));
-        return "boardDetail";
+        return "boards/boardDetail";
     }
 
     @GetMapping("/update/{boardId}")
     public String getUpdatePage(@PathVariable Long boardId, Model model) {
         model.addAttribute("board", boardService.findById(boardId));
-        return "boardUpdate";
+        return "boards/boardUpdate";
     }
 
     @GetMapping("/write")
     public String getWritePage() {
-        return "boardWrite";
+        return "boards/boardWrite";
     }
 }

@@ -15,6 +15,7 @@
   <h1>Board List</h1>
 
   <div style="text-align: right; margin-bottom: 20px;">
+    <a th:if="${isLoggedIn}" th:href="@{/members/me}" class="btn" style="background: #17a2b8;">My Profile</a>
     <a th:href="@{/login}" class="btn" style="background: #17a2b8;">Login</a>
     <a th:href="@{/signup}" class="btn" style="background: #6f42c1;">Signup</a>
     <a th:href="@{/boards/write}" class="btn" style="background: #28a745;">Write</a>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <style>
+        .container { max-width: 500px; margin: 50px auto; font-family: Arial, sans-serif; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; box-sizing: border-box; }
+        .btn-box { text-align: right; margin-top: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-save { background: #007bff; color: white; }
+        .btn-cancel { background: #6c757d; color: white; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>My Profile</h1>
+    <hr>
+
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" th:value="${member != null ? member.email : ''}" readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="username">Name</label>
+        <input type="text" id="username" th:value="${member != null ? member.username : ''}">
+    </div>
+
+    <div class="btn-box">
+        <a th:href="@{/boards}" class="btn btn-cancel">Back</a>
+        <button type="button" class="btn btn-save" onclick="updateProfile()">Save</button>
+    </div>
+</div>
+
+<script>
+    function updateProfile() {
+        const username = document.getElementById('username').value;
+
+        if (!username) {
+            alert('Please enter name.');
+            return;
+        }
+
+        fetch('/api/members/me', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: username
+            })
+        }).then(res => {
+            if (res.ok) {
+                alert('Profile updated.');
+                location.href = '/boards';
+            } else if (res.status === 401) {
+                alert('Profile can only be updated after login.');
+            } else {
+                alert('Update failed.');
+            }
+        });
+    }
+</script>
+</body>
+</html>
