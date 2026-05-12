@@ -9,4 +9,10 @@ public class MemberViewController {
     public String signupPage(){
         return "signup";
     }
+
+    // 나중에 rest컨트롤러로 가면 필요없음
+    @GetMapping("/login")
+    public String loginPage(){
+        return "login";
+    }
 }
