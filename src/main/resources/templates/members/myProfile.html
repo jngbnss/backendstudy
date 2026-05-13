@@ -3,52 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>My Profile</title>
-    <style>
-        .container { max-width: 500px; margin: 50px auto; font-family: Arial, sans-serif; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 10px; box-sizing: border-box; }
-        .btn-box { text-align: right; margin-top: 20px; }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 90px;
-            height: 40px;
-            padding: 0 20px;
-            box-sizing: border-box;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1;
-            text-decoration: none;
-        }
-        .btn-save { background: #007bff; color: white; }
-        .btn-cancel { background: #6c757d; color: white; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<div class="container">
-    <h1>My Profile</h1>
-    <hr>
-
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" th:value="${member != null ? member.email : ''}" readonly>
+<main class="page page-narrow">
+    <div class="topbar">
+        <div>
+            <h1 class="page-title">프로필 수정</h1>
+            <p class="page-subtitle">이메일은 변경할 수 없고 이름만 수정할 수 있습니다.</p>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label for="username">Name</label>
-        <input type="text" id="username" th:value="${member != null ? member.username : ''}">
-    </div>
+    <section class="panel">
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" th:value="${member != null ? member.email : ''}" readonly>
+            </div>
 
-    <div class="btn-box">
-        <a th:href="@{/boards}" class="btn btn-cancel">뒤로가기</a>
-        <button type="button" class="btn btn-save" onclick="updateProfile()">프로필수정</button>
-    </div>
-</div>
+            <div class="form-group">
+                <label for="username">Name</label>
+                <input type="text" id="username" th:value="${member != null ? member.username : ''}">
+            </div>
+
+            <div class="actions">
+                <a th:href="@{/boards}" class="btn btn-secondary">뒤로가기</a>
+                <button type="button" class="btn btn-primary" onclick="updateProfile()">프로필수정</button>
+            </div>
+        </div>
+    </section>
+</main>
 
 <script>
     function updateProfile() {

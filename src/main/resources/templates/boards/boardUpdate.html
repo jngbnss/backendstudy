@@ -3,22 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <title>Update Board</title>
-  <style>
-    .container { max-width: 800px; margin: 50px auto; font-family: Arial, sans-serif; }
-    input[type="text"], textarea { width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 12px; }
-    textarea { height: 220px; }
-    .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; background: #007bff; color: white; }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<div class="container">
-  <h1>Update Board</h1>
-  <form id="updateForm">
-    <input type="text" id="title" th:value="${board.title}">
-    <textarea id="content" th:text="${board.content}"></textarea>
-    <button type="button" class="btn" th:onclick="updateBoard([[${board.id}]])">Update</button>
-  </form>
-</div>
+<main class="page">
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">게시글 수정</h1>
+      <p class="page-subtitle">제목과 내용을 수정할 수 있습니다.</p>
+    </div>
+  </div>
+
+  <section class="panel">
+    <form id="updateForm" class="panel-body">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" th:value="${board.title}">
+      </div>
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea id="content" th:text="${board.content}"></textarea>
+      </div>
+      <div class="actions">
+        <a th:href="@{/boards/{id}(id=${board.id})}" class="btn btn-secondary">취소</a>
+        <button type="button" class="btn btn-primary" th:onclick="updateBoard([[${board.id}]])">수정</button>
+      </div>
+    </form>
+  </section>
+</main>
 
 <script>
   function updateBoard(id) {
@@ -34,6 +46,12 @@
       }).then(res => {
           if (res.ok) {
               alert('Updated.');
+              location.href = '/boards/' + id;
+          } else if (res.status === 401) {
+              alert('로그인 후 수정할 수 있습니다.');
+              location.href = '/login';
+          } else if (res.status === 403) {
+              alert('작성자만 수정할 수 있습니다.');
               location.href = '/boards/' + id;
           } else {
               alert('Update failed.');

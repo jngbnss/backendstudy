@@ -39,6 +39,12 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
+    public boolean isWriter(Long id, String username) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + id));
+        return board.getWriter().equals(username);
+    }
+
     @Transactional
     public void update(Long id, BoardUpdateDto requestDto) {
         Board board = boardRepository.findById(id)

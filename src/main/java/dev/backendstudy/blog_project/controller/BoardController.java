@@ -57,13 +57,39 @@ public class BoardController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBoard(@PathVariable Long id, @RequestBody BoardUpdateDto requestDto) {
+    public ResponseEntity<Void> updateBoard(
+            @PathVariable Long id,
+            @RequestBody BoardUpdateDto requestDto,
+            HttpSession session
+    ) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
+        if (!boardService.isWriter(id, member.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         boardService.update(id, requestDto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBoard(@PathVariable Long id, HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
+        if (!boardService.isWriter(id, member.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         boardService.delete(id);
         return ResponseEntity.ok().build();
     }

@@ -3,92 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <title>Board Detail</title>
-    <style>
-        .container { max-width: 800px; margin: 40px auto; font-family: Arial, sans-serif; }
-        .board-content { border: 1px solid #ddd; padding: 25px; border-radius: 10px; margin-bottom: 30px; }
-        .reply-section { background: #f8f9fa; padding: 20px; border-radius: 10px; }
-        .reply-list { list-style: none; padding: 0; margin-top: 20px; }
-        .reply-item { border-bottom: 1px solid #e9ecef; padding: 15px 0; }
-        .reply-author { font-weight: bold; font-size: 0.9em; color: #333; margin-bottom: 5px; }
-        .reply-text { margin: 0; color: #555; }
-        .input-group { margin-bottom: 10px; }
-        textarea { width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 80px;
-            height: 34px;
-            padding: 0 12px;
-            box-sizing: border-box;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1;
-            text-decoration: none;
-        }
-        .btn-primary { background: #007bff; color: white; margin-top: 10px; }
-        .btn-edit { background: #28a745; color: white; margin-right: 5px; }
-        .btn-cancel { background: #6c757d; color: white; }
-        .btn-signup { background: #6f42c1; color: white; margin-top: 10px; }
-        .reply-actions { margin-top: 10px; }
-        .reply-actions a { font-size: 0.85em; text-decoration: none; margin-right: 10px; cursor: pointer; }
-        .link-edit { color: #007bff; }
-        .link-delete { color: #dc3545; }
-        .edit-form { display: none; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<div class="container">
-    <div class="board-content">
-        <h1 th:text="${board.title}">Title</h1>
-        <p>Writer: <strong th:text="${board.writer}">Writer</strong></p>
-        <hr>
-        <div th:text="${board.content}" style="min-height: 150px; white-space: pre-wrap;">Content</div>
-        <div style="margin-top: 20px;">
-            <a th:href="@{/boards}" style="text-decoration: none; color: #007bff;">Back to list</a>
-            <a th:href="@{/boards/update/{id}(id=${board.id})}" style="text-decoration: none; color: #28a745; margin-left: 10px;">Edit</a>
+<main class="page">
+    <div class="topbar">
+        <div>
+            <h1 class="page-title" th:text="${board.title}">Title</h1>
+            <p class="page-subtitle">작성자: <strong th:text="${board.writer}">Writer</strong></p>
+        </div>
+        <div class="actions">
+            <a th:href="@{/boards}" class="btn btn-secondary">목록</a>
+            <a th:if="${isWriter}" th:href="@{/boards/update/{id}(id=${board.id})}" class="btn btn-success">수정</a>
+            <button th:if="${isWriter}" type="button" class="btn btn-danger" th:onclick="deleteBoard([[${board.id}]])">삭제</button>
         </div>
     </div>
 
-    <div class="reply-section">
-        <h3>Replies</h3>
-        <div th:if="${isLoggedIn}" class="reply-form">
-            <div class="input-group">
-                <textarea id="replyContent" placeholder="Enter reply content"></textarea>
+    <section class="panel">
+        <div class="panel-body">
+            <div class="content-box" th:text="${board.content}">Content</div>
+        </div>
+    </section>
+
+    <section class="panel" style="margin-top: 20px;">
+        <div class="panel-body">
+            <div class="topbar" style="margin-bottom: 14px;">
+                <div>
+                    <h2 class="page-title" style="font-size: 22px;">댓글</h2>
+                    <p class="page-subtitle">게시글에 대한 의견을 남겨보세요.</p>
+                </div>
             </div>
-            <button type="button" class="btn btn-primary" th:onclick="submitReply([[${board.id}]])">댓글작성</button>
-        </div>
-        <div th:unless="${isLoggedIn}" class="reply-form">
-            <p style="color: #666;">댓글 작성은 로그인 회원만 가능합니다.</p>
-            <a th:href="@{/login}" class="btn btn-primary">로그인</a>
-            <a th:href="@{/signup}" class="btn btn-signup">회원가입</a>
-        </div>
 
-        <hr>
+            <div th:if="${isLoggedIn}">
+                <div class="form-group">
+                    <label for="replyContent">댓글 내용</label>
+                    <textarea id="replyContent" placeholder="Enter reply content"></textarea>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn btn-primary" th:onclick="submitReply([[${board.id}]])">댓글작성</button>
+                </div>
+            </div>
 
-        <ul class="reply-list">
-            <li th:if="${#lists.isEmpty(board.replies)}" style="color: #999; text-align: center;">No replies yet.</li>
-            <li class="reply-item" th:each="reply : ${board.replies}" th:id="'reply-item-' + ${reply.id}">
-                <div class="reply-author" th:text="${reply.writer}">Writer</div>
-                <p class="reply-text" th:id="'reply-text-' + ${reply.id}" th:text="${reply.content}">Reply content</p>
-                <div th:id="'edit-wrapper-' + ${reply.id}" class="edit-form">
-                    <textarea th:id="'edit-content-' + ${reply.id}" th:text="${reply.content}"></textarea>
-                    <div style="margin-top: 5px;">
-                        <button class="btn btn-edit" th:onclick="updateReply([[${reply.id}]])">수정</button>
-                        <button class="btn btn-cancel" th:onclick="toggleEdit([[${reply.id}]])">취소</button>
+            <div th:unless="${isLoggedIn}" class="notice">
+                <p>댓글 작성은 로그인 회원만 가능합니다.</p>
+                <div class="actions" style="justify-content: center;">
+                    <a th:href="@{/login}" class="btn btn-primary">로그인</a>
+                    <a th:href="@{/signup}" class="btn btn-purple">회원가입</a>
+                </div>
+            </div>
+
+            <ul class="reply-list">
+                <li th:if="${#lists.isEmpty(board.replies)}" class="empty">아직 등록된 댓글이 없습니다.</li>
+                <li class="reply-item" th:each="reply : ${board.replies}" th:id="'reply-item-' + ${reply.id}">
+                    <div class="reply-author" th:text="${reply.writer}">Writer</div>
+                    <p class="reply-text" th:id="'reply-text-' + ${reply.id}" th:text="${reply.content}">Reply content</p>
+                    <div th:id="'edit-wrapper-' + ${reply.id}" class="edit-form">
+                        <textarea th:id="'edit-content-' + ${reply.id}" th:text="${reply.content}"></textarea>
+                        <div class="actions" style="justify-content: flex-start; margin-top: 8px;">
+                            <button class="btn btn-success" th:onclick="updateReply([[${reply.id}]])">수정</button>
+                            <button class="btn btn-secondary" th:onclick="toggleEdit([[${reply.id}]])">취소</button>
+                        </div>
                     </div>
-                </div>
-                <div class="reply-actions" th:id="'reply-btns-' + ${reply.id}">
-                    <a href="javascript:void(0)" class="link-edit" th:onclick="toggleEdit([[${reply.id}]])">Edit</a>
-                    <a href="javascript:void(0)" class="link-delete" th:onclick="deleteReply([[${reply.id}]])">Delete</a>
-                </div>
-            </li>
-        </ul>
-    </div>
-</div>
+                    <div class="reply-actions" th:id="'reply-btns-' + ${reply.id}">
+                        <a href="javascript:void(0)" class="text-link" th:onclick="toggleEdit([[${reply.id}]])">수정</a>
+                        <a href="javascript:void(0)" class="text-link text-link-danger" th:onclick="deleteReply([[${reply.id}]])">삭제</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+</main>
 
 <script th:inline="javascript">
     function submitReply(boardId) {
@@ -127,7 +111,7 @@
         } else {
             editWrapper.style.display = 'none';
             textArea.style.display = 'block';
-            btnWrapper.style.display = 'block';
+            btnWrapper.style.display = 'flex';
         }
     }
 
@@ -162,6 +146,26 @@
                 location.reload();
             } else {
                 alert('Delete failed.');
+            }
+        });
+    }
+
+    function deleteBoard(boardId) {
+        if (!confirm('게시글을 삭제하시겠습니까?')) return;
+
+        fetch(`/api/boards/${boardId}`, {
+            method: 'DELETE'
+        }).then(res => {
+            if (res.ok || res.status === 204) {
+                alert('삭제되었습니다.');
+                location.href = '/boards';
+            } else if (res.status === 401) {
+                alert('로그인 후 삭제할 수 있습니다.');
+                location.href = '/login';
+            } else if (res.status === 403) {
+                alert('작성자만 삭제할 수 있습니다.');
+            } else {
+                alert('삭제에 실패했습니다.');
             }
         });
     }

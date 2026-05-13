@@ -3,61 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Board List</title>
-  <style>
-    .container { max-width: 800px; margin: 50px auto; font-family: Arial, sans-serif; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 72px;
-      height: 32px;
-      padding: 0 10px;
-      box-sizing: border-box;
-      border: none;
-      background: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1;
-    }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<div class="container">
-  <h1>Board List</h1>
-
-  <div style="text-align: right; margin-bottom: 20px;">
-    <a th:if="${isLoggedIn}" th:href="@{/members/me}" class="btn" style="background: #17a2b8;">프로필수정</a>
-    <button th:if="${isLoggedIn}" type="button" class="btn" style="background: #6c757d;" onclick="logout()">로그아웃</button>
-    <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn" style="background: #17a2b8;">로그인</a>
-    <a th:unless="${isLoggedIn}" th:href="@{/signup}" class="btn" style="background: #6f42c1;">회원가입</a>
-    <a th:href="@{/boards/write}" class="btn" style="background: #28a745;">글작성</a>
+<main class="page">
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">게시글 목록</h1>
+      <p class="page-subtitle">작성된 글을 확인하고 새 글을 작성할 수 있습니다.</p>
+    </div>
+    <div class="actions">
+      <a th:if="${isLoggedIn}" th:href="@{/members/me}" class="btn btn-primary">프로필수정</a>
+      <button th:if="${isLoggedIn}" type="button" class="btn btn-secondary" onclick="logout()">로그아웃</button>
+      <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn btn-primary">로그인</a>
+      <a th:unless="${isLoggedIn}" th:href="@{/signup}" class="btn btn-purple">회원가입</a>
+      <a th:href="@{/boards/write}" class="btn btn-success">글작성</a>
+    </div>
   </div>
 
-  <table>
-    <thead>
-    <tr>
-      <th>ID</th>
-      <th>Title</th>
-      <th>Writer</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="board : ${boards}">
-      <td th:text="${board.id}">1</td>
-      <td>
-        <a th:href="@{/boards/{id}(id=${board.id})}" th:text="${board.title}">Title</a>
-      </td>
-      <td th:text="${board.writer}">Writer</td>
-    </tr>
-    </tbody>
-  </table>
-</div>
+  <section class="panel table-wrap">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Writer</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:if="${#lists.isEmpty(boards)}">
+        <td colspan="3" class="empty">아직 등록된 게시글이 없습니다.</td>
+      </tr>
+      <tr th:each="board : ${boards}">
+        <td th:text="${board.id}">1</td>
+        <td>
+          <a class="title-link" th:href="@{/boards/{id}(id=${board.id})}" th:text="${board.title}">Title</a>
+        </td>
+        <td th:text="${board.writer}">Writer</td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</main>
 <script>
   function logout() {
       fetch('/api/members/logout', {

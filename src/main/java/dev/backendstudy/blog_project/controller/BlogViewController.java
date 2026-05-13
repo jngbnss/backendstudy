@@ -1,6 +1,7 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.service.BoardService;
+import dev.backendstudy.blog_project.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/boards")
 public class BlogViewController {
     private final BoardService boardService;
+    private final MemberService memberService;
 
     @GetMapping
     public String getBoardList(Model model, HttpSession session) {
@@ -24,14 +26,38 @@ public class BlogViewController {
 
     @GetMapping("/{boardId}")
     public String getBoardPage(@PathVariable Long boardId, Model model, HttpSession session) {
-        model.addAttribute("board", boardService.findById(boardId));
-        model.addAttribute("isLoggedIn", session.getAttribute("loginMemberId") != null);
+        var board = boardService.findById(boardId);
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+        boolean isLoggedIn = loginMemberId != null;
+        boolean isWriter = false;
+
+        if (isLoggedIn) {
+            var member = memberService.findMyInfo(loginMemberId);
+            isWriter = board.getWriter().equals(member.getUsername());
+        }
+
+        model.addAttribute("board", board);
+        model.addAttribute("isLoggedIn", isLoggedIn);
+        model.addAttribute("isWriter", isWriter);
         return "boards/boardDetail";
     }
 
     @GetMapping("/update/{boardId}")
-    public String getUpdatePage(@PathVariable Long boardId, Model model) {
-        model.addAttribute("board", boardService.findById(boardId));
+    public String getUpdatePage(@PathVariable Long boardId, Model model, HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return "redirect:/login";
+        }
+
+        var board = boardService.findById(boardId);
+        var member = memberService.findMyInfo(loginMemberId);
+
+        if (!board.getWriter().equals(member.getUsername())) {
+            return "redirect:/boards/" + boardId;
+        }
+
+        model.addAttribute("board", board);
         return "boards/boardUpdate";
     }
 
