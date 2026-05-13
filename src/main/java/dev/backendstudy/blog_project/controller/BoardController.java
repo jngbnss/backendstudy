@@ -3,7 +3,10 @@ package dev.backendstudy.blog_project.controller;
 import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
+import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
 import dev.backendstudy.blog_project.service.BoardService;
+import dev.backendstudy.blog_project.service.MemberService;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,10 +25,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/boards")
 public class BoardController {
     private final BoardService boardService;
+    private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<Long> createdBoard(@RequestBody BoardRequestDto requestDto) {
-        Long id = boardService.save(requestDto);
+    public ResponseEntity<Long> createdBoard(@RequestBody BoardRequestDto requestDto, HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
+        BoardRequestDto saveRequestDto = new BoardRequestDto(
+                requestDto.getTitle(),
+                requestDto.getContent(),
+                member.getUsername()
+        );
+
+        Long id = boardService.save(saveRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 

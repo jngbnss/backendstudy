@@ -9,9 +9,24 @@
     label { display: block; margin-bottom: 5px; font-weight: bold; }
     input { width: 100%; padding: 10px; box-sizing: border-box; }
     .btn-box { text-align: right; margin-top: 20px; }
-    .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 90px;
+      height: 40px;
+      padding: 0 20px;
+      box-sizing: border-box;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1;
+      text-decoration: none;
+    }
     .btn-save { background: #007bff; color: white; }
-    .btn-cancel { background: #6c757d; color: white; text-decoration: none; display: inline-block; }
+    .btn-cancel { background: #6c757d; color: white; }
   </style>
 </head>
 <body>
@@ -31,8 +46,8 @@
     </div>
 
     <div class="btn-box">
-      <a th:href="@{/boards}" class="btn btn-cancel">Cancel</a>
-      <button type="button" class="btn btn-save" onclick="login()">Login</button>
+      <a th:href="@{/boards}" class="btn btn-cancel">취소</a>
+      <button type="button" class="btn btn-save" onclick="login()">로그인</button>
     </div>
   </form>
 </div>

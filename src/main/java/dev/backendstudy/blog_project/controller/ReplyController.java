@@ -1,7 +1,10 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
+import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
+import dev.backendstudy.blog_project.service.MemberService;
 import dev.backendstudy.blog_project.service.ReplyService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +21,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ReplyController {
     private final ReplyService replyService;
+    private final MemberService memberService;
 
     @PostMapping("/boards/{boardId}/replies")
-    public ResponseEntity<Long> createReply(@PathVariable Long boardId, @RequestBody ReplyRequestDto requestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(replyService.saveReply(boardId, requestDto));
+    public ResponseEntity<Long> createReply(
+            @PathVariable Long boardId,
+            @RequestBody ReplyRequestDto requestDto,
+            HttpSession session
+    ) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
+        ReplyRequestDto saveRequestDto = new ReplyRequestDto(requestDto.getContent(), member.getUsername());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(replyService.saveReply(boardId, saveRequestDto));
     }
 
     @PutMapping("/replies/{replyId}")

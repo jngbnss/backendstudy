@@ -23,8 +23,9 @@ public class BlogViewController {
     }
 
     @GetMapping("/{boardId}")
-    public String getBoardPage(@PathVariable Long boardId, Model model) {
+    public String getBoardPage(@PathVariable Long boardId, Model model, HttpSession session) {
         model.addAttribute("board", boardService.findById(boardId));
+        model.addAttribute("isLoggedIn", session.getAttribute("loginMemberId") != null);
         return "boards/boardDetail";
     }
 
@@ -35,7 +36,8 @@ public class BlogViewController {
     }
 
     @GetMapping("/write")
-    public String getWritePage() {
+    public String getWritePage(HttpSession session, Model model) {
+        model.addAttribute("isLoggedIn", session.getAttribute("loginMemberId") != null);
         return "boards/boardWrite";
     }
 }
