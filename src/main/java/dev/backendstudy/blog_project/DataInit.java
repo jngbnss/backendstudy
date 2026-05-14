@@ -22,7 +22,7 @@ public class DataInit implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (memberRepository.existsByLoginId("hong")) {
+        if (memberRepository.existsByLoginId("admin")) {
             return;
         }
 
@@ -33,23 +33,23 @@ public class DataInit implements CommandLineRunner {
         );
 
         Member member2 = memberRepository.save(
-                new Member("문종빈", "jngbnss", encoder.encode("answhdqlscjswo"))
+                new Member("최강싸피", "jngbnss", encoder.encode("answhdqlscjswo"))
         );
 
         Board board1 = boardRepository.save(
-                new Board("공지사항", "공지사항 입니다.", member1.getUsername())
+                new Board("공지사항", "공지사항 입니다.", member1)
         );
 
         boardRepository.save(
-                new Board("난 천재다", "이게 맞다", member2.getUsername())
+                new Board("버그발견하면 알려주세요! ", "땡큐!", member2)
         );
 
         replyRepository.save(
-                new Reply("비밀 댓글입니다.", member2.getUsername(), board1)
+                new Reply("비밀 댓글입니다.", member2, board1)
         );
 
         replyRepository.save(
-                new Reply("기밀 댓글입니다.", member1.getUsername(), board1)
+                new Reply("기밀 댓글입니다.", member1, board1)
         );
     }
 }

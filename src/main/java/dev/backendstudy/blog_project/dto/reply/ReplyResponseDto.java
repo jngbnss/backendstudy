@@ -9,12 +9,14 @@ public class ReplyResponseDto {
     private Long id;
     private String content;
     private String writer;
+    private Long writerId;
     private LocalDateTime createdAt;
 
     public ReplyResponseDto(Reply reply) {
         this.id = reply.getId();
         this.content = reply.getContent();
         this.writer = reply.getWriter();
+        this.writerId = reply.getWriterId();
         this.createdAt = reply.getCreatedAt();
     }
 }

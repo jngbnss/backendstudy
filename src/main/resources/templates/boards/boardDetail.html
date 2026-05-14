@@ -64,7 +64,7 @@
                             <button class="btn btn-secondary" th:onclick="toggleEdit([[${reply.id}]])">취소</button>
                         </div>
                     </div>
-                    <div th:if="${isLoggedIn and reply.writer == loginUsername}" class="reply-actions" th:id="'reply-btns-' + ${reply.id}">
+                    <div th:if="${isLoggedIn and reply.writerId == loginMemberId}" class="reply-actions" th:id="'reply-btns-' + ${reply.id}">
                         <a href="javascript:void(0)" class="text-link" th:onclick="toggleEdit([[${reply.id}]])">수정</a>
                         <a href="javascript:void(0)" class="text-link text-link-danger" th:onclick="deleteReply([[${reply.id}]])">삭제</a>
                     </div>

@@ -3,7 +3,7 @@ package dev.backendstudy.blog_project.controller;
 import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
-import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
+import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.service.BoardService;
 import dev.backendstudy.blog_project.service.MemberService;
 import jakarta.servlet.http.HttpSession;
@@ -35,14 +35,8 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
-        BoardRequestDto saveRequestDto = new BoardRequestDto(
-                requestDto.getTitle(),
-                requestDto.getContent(),
-                member.getUsername()
-        );
-
-        Long id = boardService.save(saveRequestDto);
+        Member member = memberService.findMember(loginMemberId);
+        Long id = boardService.save(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
@@ -68,8 +62,7 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
-        if (!boardService.isWriter(id, member.getUsername())) {
+        if (!boardService.isWriter(id, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -85,8 +78,7 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
-        if (!boardService.isWriter(id, member.getUsername())) {
+        if (!boardService.isWriter(id, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
+import dev.backendstudy.blog_project.entity.Member;
+import dev.backendstudy.blog_project.repository.MemberRepository;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,23 +21,29 @@ class BoardServiceTest {
     @Autowired
     private BoardService boardService;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Test
     @DisplayName("save board")
     void save() {
-        BoardRequestDto requestDto = new BoardRequestDto("test title", "test content", "writer");
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
+        BoardRequestDto requestDto = new BoardRequestDto("test title", "test content", null);
 
-        Long savedId = boardService.save(requestDto);
+        Long savedId = boardService.save(requestDto, member);
 
         BoardResponseDto result = boardService.findById(savedId);
         assertThat(result.getTitle()).isEqualTo("test title");
         assertThat(result.getWriter()).isEqualTo("writer");
+        assertThat(result.getWriterId()).isEqualTo(member.getId());
     }
 
     @Test
     @DisplayName("find all boards")
     void findAll() {
-        boardService.save(new BoardRequestDto("title1", "content1", "writer"));
-        boardService.save(new BoardRequestDto("title2", "content2", "writer"));
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
+        boardService.save(new BoardRequestDto("title1", "content1", null), member);
+        boardService.save(new BoardRequestDto("title2", "content2", null), member);
 
         List<BoardResponseDto> all = boardService.findAll();
 
@@ -53,7 +61,8 @@ class BoardServiceTest {
     @Test
     @DisplayName("update board")
     void update() {
-        Long savedId = boardService.save(new BoardRequestDto("old title", "old content", "writer"));
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
+        Long savedId = boardService.save(new BoardRequestDto("old title", "old content", null), member);
         BoardUpdateDto updateDto = new BoardUpdateDto("updated title", "updated content");
 
         boardService.update(savedId, updateDto);
@@ -66,8 +75,9 @@ class BoardServiceTest {
     @Test
     @DisplayName("delete board")
     void delete() {
-        BoardRequestDto requestDto = new BoardRequestDto("delete title", "content", "writer");
-        Long savedId = boardService.save(requestDto);
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
+        BoardRequestDto requestDto = new BoardRequestDto("delete title", "content", null);
+        Long savedId = boardService.save(requestDto, member);
 
         boardService.delete(savedId);
 

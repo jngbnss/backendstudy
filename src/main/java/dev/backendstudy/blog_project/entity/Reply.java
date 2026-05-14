@@ -28,8 +28,9 @@ public class Reply {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false)
-    private String writer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
@@ -39,12 +40,20 @@ public class Reply {
     private LocalDateTime createdAt;
 
     @Builder
-    public Reply(String content, String writer, Board board) {
+    public Reply(String content, Member member, Board board) {
         this.content = content;
-        this.writer = writer;
+        this.member = member;
         if (board != null) {
             setBoard(board);
         }
+    }
+
+    public String getWriter() {
+        return member.getUsername();
+    }
+
+    public Long getWriterId() {
+        return member.getId();
     }
 
     public void update(String content) {

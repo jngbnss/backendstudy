@@ -2,6 +2,7 @@ package dev.backendstudy.blog_project.service;
 
 import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
 import dev.backendstudy.blog_project.entity.Board;
+import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.entity.Reply;
 import dev.backendstudy.blog_project.repository.BoardRepository;
 import dev.backendstudy.blog_project.repository.ReplyRepository;
@@ -16,13 +17,13 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
 
-    public Long saveReply(Long boardId, ReplyRequestDto requestDto) {
+    public Long saveReply(Long boardId, ReplyRequestDto requestDto, Member member) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + boardId));
 
         Reply reply = Reply.builder()
                 .content(requestDto.getContent())
-                .writer(requestDto.getWriter())
+                .member(member)
                 .board(board)
                 .build();
 
@@ -37,10 +38,10 @@ public class ReplyService {
         return replyId;
     }
 
-    public boolean isWriter(Long replyId, String username) {
+    public boolean isWriter(Long replyId, Long memberId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("Reply not found. id=" + replyId));
-        return reply.getWriter().equals(username);
+        return reply.getWriterId().equals(memberId);
     }
 
     public void deleteReply(Long replyId) {

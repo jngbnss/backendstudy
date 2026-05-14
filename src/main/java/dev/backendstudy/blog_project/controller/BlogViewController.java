@@ -32,10 +32,8 @@ public class BlogViewController {
         boolean isWriter = false;
 
         if (isLoggedIn) {
-            var member = memberService.findMyInfo(loginMemberId);
-            String loginUsername = member.getUsername();
-            isWriter = board.getWriter().equals(loginUsername);
-            model.addAttribute("loginUsername", loginUsername);
+            isWriter = board.getWriterId().equals(loginMemberId);
+            model.addAttribute("loginMemberId", loginMemberId);
         }
 
         model.addAttribute("board", board);
@@ -53,9 +51,7 @@ public class BlogViewController {
         }
 
         var board = boardService.findById(boardId);
-        var member = memberService.findMyInfo(loginMemberId);
-
-        if (!board.getWriter().equals(member.getUsername())) {
+        if (!board.getWriterId().equals(loginMemberId)) {
             return "redirect:/boards/" + boardId;
         }
 

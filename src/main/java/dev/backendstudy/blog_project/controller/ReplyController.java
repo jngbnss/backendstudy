@@ -1,7 +1,7 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
-import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
+import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.service.MemberService;
 import dev.backendstudy.blog_project.service.ReplyService;
 import jakarta.servlet.http.HttpSession;
@@ -35,10 +35,9 @@ public class ReplyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
-        ReplyRequestDto saveRequestDto = new ReplyRequestDto(requestDto.getContent(), member.getUsername());
+        Member member = memberService.findMember(loginMemberId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(replyService.saveReply(boardId, saveRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(replyService.saveReply(boardId, requestDto, member));
     }
 
     @PutMapping("/replies/{replyId}")
@@ -53,8 +52,7 @@ public class ReplyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
-        if (!replyService.isWriter(replyId, member.getUsername())) {
+        if (!replyService.isWriter(replyId, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -69,8 +67,7 @@ public class ReplyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
-        if (!replyService.isWriter(replyId, member.getUsername())) {
+        if (!replyService.isWriter(replyId, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

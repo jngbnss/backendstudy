@@ -4,6 +4,7 @@ import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import dev.backendstudy.blog_project.entity.Board;
+import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.repository.BoardRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,11 +19,11 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public Long save(BoardRequestDto requestDto) {
+    public Long save(BoardRequestDto requestDto, Member member) {
         Board board = new Board(
                 requestDto.getTitle(),
                 requestDto.getContent(),
-                requestDto.getWriter()
+                member
         );
         return boardRepository.save(board).getId();
     }
@@ -39,10 +40,10 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
-    public boolean isWriter(Long id, String username) {
+    public boolean isWriter(Long id, Long memberId) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + id));
-        return board.getWriter().equals(username);
+        return board.getWriterId().equals(memberId);
     }
 
     @Transactional

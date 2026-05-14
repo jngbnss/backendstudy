@@ -4,9 +4,12 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,8 +35,9 @@ public class Board {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private String writer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @CreatedDate
     @Column(updatable = false)
@@ -45,10 +49,18 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reply> replies = new ArrayList<>();
 
-    public Board(String title, String content, String writer) {
+    public Board(String title, String content, Member member) {
         this.title = title;
         this.content = content;
-        this.writer = writer;
+        this.member = member;
+    }
+
+    public String getWriter() {
+        return member.getUsername();
+    }
+
+    public Long getWriterId() {
+        return member.getId();
     }
 
     public void update(String title, String content) {

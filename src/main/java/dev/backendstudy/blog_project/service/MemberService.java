@@ -45,11 +45,18 @@ public class MemberService {
         return member;
     }
 
+    public boolean isLoginIdAvailable(String loginId) {
+        return !memberRepository.existsByLoginId(loginId);
+    }
+
     public MemberResponseDto findMyInfo(Long memberId) {
+        return new MemberResponseDto(findMember(memberId));
+    }
+
+    public Member findMember(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
-        return new MemberResponseDto(member);
+        return member;
     }
 
     @Transactional

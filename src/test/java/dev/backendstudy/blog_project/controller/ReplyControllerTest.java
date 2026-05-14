@@ -1,6 +1,7 @@
 package dev.backendstudy.blog_project.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
 import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.service.MemberService;
@@ -41,9 +41,10 @@ class ReplyControllerTest {
     void createReply() throws Exception {
         Long boardId = 1L;
         Long memberId = 1L;
+        Member member = new Member("writer", "writerId", "password");
         ReplyRequestDto requestDto = new ReplyRequestDto("reply content", "writer");
-        given(memberService.findMyInfo(memberId)).willReturn(new MemberResponseDto(new Member("writer", "writerId", "password")));
-        given(replyService.saveReply(any(), any())).willReturn(10L);
+        given(memberService.findMember(memberId)).willReturn(member);
+        given(replyService.saveReply(eq(boardId), any(), eq(member))).willReturn(10L);
 
         mockMvc.perform(post("/api/boards/{boardId}/replies", boardId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,8 +60,7 @@ class ReplyControllerTest {
         Long replyId = 1L;
         Long memberId = 1L;
         ReplyRequestDto requestDto = new ReplyRequestDto("updated content", "writer");
-        given(memberService.findMyInfo(memberId)).willReturn(new MemberResponseDto(new Member("writer", "writerId", "password")));
-        given(replyService.isWriter(replyId, "writer")).willReturn(true);
+        given(replyService.isWriter(replyId, memberId)).willReturn(true);
         given(replyService.updateReply(any(), any())).willReturn(replyId);
 
         mockMvc.perform(put("/api/replies/{replyId}", replyId)
@@ -76,8 +76,7 @@ class ReplyControllerTest {
     void deleteReply() throws Exception {
         Long replyId = 1L;
         Long memberId = 1L;
-        given(memberService.findMyInfo(memberId)).willReturn(new MemberResponseDto(new Member("writer", "writerId", "password")));
-        given(replyService.isWriter(replyId, "writer")).willReturn(true);
+        given(replyService.isWriter(replyId, memberId)).willReturn(true);
 
         mockMvc.perform(delete("/api/replies/{replyId}", replyId)
                         .sessionAttr("loginMemberId", memberId))

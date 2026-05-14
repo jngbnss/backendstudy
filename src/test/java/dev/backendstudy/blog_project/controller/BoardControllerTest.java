@@ -57,7 +57,8 @@ class BoardControllerTest {
     @Test
     @DisplayName("get all boards")
     void getAllBoards() throws Exception {
-        boardRepository.save(new Board("title1", "content1", "writer"));
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
+        boardRepository.save(new Board("title1", "content1", member));
 
         mockMvc.perform(get("/api/boards"))
                 .andExpect(status().isOk())
@@ -67,7 +68,8 @@ class BoardControllerTest {
     @Test
     @DisplayName("get board")
     void getBoard() throws Exception {
-        Board saved = boardRepository.save(new Board("read title", "content", "writer"));
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
+        Board saved = boardRepository.save(new Board("read title", "content", member));
 
         mockMvc.perform(get("/api/boards/" + saved.getId()))
                 .andExpect(status().isOk())
@@ -79,7 +81,7 @@ class BoardControllerTest {
     @DisplayName("update board")
     void updateBoard() throws Exception {
         Member member = memberRepository.save(new Member("writer", "writerId", "password"));
-        Board saved = boardRepository.save(new Board("old title", "content", "writer"));
+        Board saved = boardRepository.save(new Board("old title", "content", member));
         BoardUpdateDto updateDto = new BoardUpdateDto("updated title", "updated content");
         String json = objectMapper.writeValueAsString(updateDto);
 
@@ -94,7 +96,7 @@ class BoardControllerTest {
     @DisplayName("delete board")
     void deleteBoard() throws Exception {
         Member member = memberRepository.save(new Member("writer", "writerId", "password"));
-        Board saved = boardRepository.save(new Board("delete title", "content", "writer"));
+        Board saved = boardRepository.save(new Board("delete title", "content", member));
 
         mockMvc.perform(delete("/api/boards/" + saved.getId())
                         .sessionAttr("loginMemberId", member.getId()))

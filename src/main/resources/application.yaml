@@ -36,3 +36,19 @@ spring:
 
 data-init:
   enabled: true
+
+
+#spring:
+#  application:
+#    name: blog-project
+#
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/board?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+#    username: ssafy
+#    password: ssafy
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true

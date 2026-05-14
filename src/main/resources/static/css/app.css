@@ -110,6 +110,34 @@ input[readonly] {
   color: #6b7280;
 }
 
+.input-with-button {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+.input-with-button .btn {
+  flex: 0 0 auto;
+}
+
+.form-message {
+  min-height: 18px;
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-message-success {
+  color: #047857;
+}
+
+.form-message-error {
+  color: #dc2626;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

@@ -12,6 +12,7 @@ public class BoardResponseDto {
     private String title;
     private String content;
     private String writer;
+    private Long writerId;
     private List<ReplyResponseDto> replies;
 
     public BoardResponseDto(Board board) {
@@ -19,6 +20,7 @@ public class BoardResponseDto {
         this.title = board.getTitle();
         this.content = board.getContent();
         this.writer = board.getWriter();
+        this.writerId = board.getWriterId();
         this.replies = board.getReplies().stream()
                 .map(ReplyResponseDto::new)
                 .collect(Collectors.toList());
