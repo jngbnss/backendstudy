@@ -15,6 +15,8 @@ spring:
   application:
     name: blog-project
 
+
+
   datasource:
     url: jdbc:h2:mem:blogdb;MODE=MySQL;DATABASE_TO_LOWER=TRUE
     username: sa
@@ -31,3 +33,6 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+data-init:
+  enabled: true

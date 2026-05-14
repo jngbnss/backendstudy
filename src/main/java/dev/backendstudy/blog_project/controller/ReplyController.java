@@ -42,12 +42,38 @@ public class ReplyController {
     }
 
     @PutMapping("/replies/{replyId}")
-    public ResponseEntity<Long> updateReply(@PathVariable Long replyId, @RequestBody ReplyRequestDto requestDto) {
+    public ResponseEntity<Long> updateReply(
+            @PathVariable Long replyId,
+            @RequestBody ReplyRequestDto requestDto,
+            HttpSession session
+    ) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
+        if (!replyService.isWriter(replyId, member.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         return ResponseEntity.ok(replyService.updateReply(replyId, requestDto));
     }
 
     @DeleteMapping("/replies/{replyId}")
-    public ResponseEntity<Void> deleteReply(@PathVariable Long replyId) {
+    public ResponseEntity<Void> deleteReply(@PathVariable Long replyId, HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MemberResponseDto member = memberService.findMyInfo(loginMemberId);
+        if (!replyService.isWriter(replyId, member.getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         replyService.deleteReply(replyId);
         return ResponseEntity.noContent().build();
     }

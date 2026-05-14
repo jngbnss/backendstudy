@@ -18,61 +18,45 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    //회원가입
     @Transactional
     public Long signup(MemberSignupRequestDto requestDto) {
-        if (memberRepository.existsByEmail(requestDto.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        if (memberRepository.existsByLoginId(requestDto.getLoginId())) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
-        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
+        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
         Member member = new Member(
                 requestDto.getUsername(),
-                requestDto.getEmail(),
+                requestDto.getLoginId(),
                 encodedPassword
-
         );
 
         return memberRepository.save(member).getId();
     }
 
-    //로그인
-    public Member login(MemberLoginRequestDto requestDto){
-        Member member = memberRepository.findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
+    public Member login(MemberLoginRequestDto requestDto) {
+        Member member = memberRepository.findByLoginId(requestDto.getLoginId())
+                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다."));
 
-        if(!passwordEncoder.matches(requestDto.getPassword(),member.getPassword())){
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.");
         }
-        return member;
 
+        return member;
     }
 
-    //회원조회
-    public MemberResponseDto findMyInfo(Long memberId){
+    public MemberResponseDto findMyInfo(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         return new MemberResponseDto(member);
     }
 
-    // 회원수정
     @Transactional
-    public void updateMyInfo(Long memberId, MemberUpdateRequestDto requestDto){
+    public void updateMyInfo(Long memberId, MemberUpdateRequestDto requestDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
         member.updateUsername(requestDto.getUsername());
     }
-
-
-    //회원가입
-    //로그인
-    //회원조회
-    //이메일 중복 확인
-    //회원 정보 수정
-    // 비밀번호 변경
-    // 회원 탈퇴
-
-
 }

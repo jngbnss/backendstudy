@@ -10,25 +10,25 @@
     <div class="topbar">
         <div>
             <h1 class="page-title">프로필 수정</h1>
-            <p class="page-subtitle">이메일은 변경할 수 없고 이름만 수정할 수 있습니다.</p>
+            <p class="page-subtitle">아이디는 변경할 수 없고 이름만 수정할 수 있습니다.</p>
         </div>
     </div>
 
     <section class="panel">
         <div class="panel-body">
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" th:value="${member != null ? member.email : ''}" readonly>
+                <label for="loginId">아이디</label>
+                <input type="text" id="loginId" th:value="${member != null ? member.loginId : ''}" readonly>
             </div>
 
             <div class="form-group">
-                <label for="username">Name</label>
+                <label for="username">이름</label>
                 <input type="text" id="username" th:value="${member != null ? member.username : ''}">
             </div>
 
             <div class="actions">
                 <a th:href="@{/boards}" class="btn btn-secondary">뒤로가기</a>
-                <button type="button" class="btn btn-primary" onclick="updateProfile()">프로필수정</button>
+                <button type="button" class="btn btn-primary" onclick="updateProfile()">프로필 수정</button>
             </div>
         </div>
     </section>
@@ -39,7 +39,7 @@
         const username = document.getElementById('username').value;
 
         if (!username) {
-            alert('Please enter name.');
+            alert('이름을 입력해주세요.');
             return;
         }
 
@@ -51,12 +51,12 @@
             })
         }).then(res => {
             if (res.ok) {
-                alert('Profile updated.');
+                alert('프로필이 수정되었습니다.');
                 location.href = '/boards';
             } else if (res.status === 401) {
-                alert('Profile can only be updated after login.');
+                alert('로그인 후 수정할 수 있습니다.');
             } else {
-                alert('Update failed.');
+                alert('수정에 실패했습니다.');
             }
         });
     }

@@ -12,7 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import dev.backendstudy.blog_project.entity.Board;
+import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.repository.BoardRepository;
+import dev.backendstudy.blog_project.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +37,19 @@ class BoardControllerTest {
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Test
     @DisplayName("create board")
     void createBoard() throws Exception {
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
         BoardRequestDto requestDto = new BoardRequestDto("controller title", "controller content", "writer");
         String json = objectMapper.writeValueAsString(requestDto);
 
         mockMvc.perform(post("/api/boards")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .sessionAttr("loginMemberId", member.getId())
                         .content(json))
                 .andExpect(status().isCreated());
     }
@@ -71,12 +78,14 @@ class BoardControllerTest {
     @Test
     @DisplayName("update board")
     void updateBoard() throws Exception {
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
         Board saved = boardRepository.save(new Board("old title", "content", "writer"));
         BoardUpdateDto updateDto = new BoardUpdateDto("updated title", "updated content");
         String json = objectMapper.writeValueAsString(updateDto);
 
         mockMvc.perform(put("/api/boards/" + saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
+                        .sessionAttr("loginMemberId", member.getId())
                         .content(json))
                 .andExpect(status().isOk());
     }
@@ -84,9 +93,11 @@ class BoardControllerTest {
     @Test
     @DisplayName("delete board")
     void deleteBoard() throws Exception {
+        Member member = memberRepository.save(new Member("writer", "writerId", "password"));
         Board saved = boardRepository.save(new Board("delete title", "content", "writer"));
 
-        mockMvc.perform(delete("/api/boards/" + saved.getId()))
+        mockMvc.perform(delete("/api/boards/" + saved.getId())
+                        .sessionAttr("loginMemberId", member.getId()))
                 .andExpect(status().isOk());
 
         boolean exists = boardRepository.existsById(saved.getId());

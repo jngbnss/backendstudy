@@ -33,7 +33,9 @@ public class BlogViewController {
 
         if (isLoggedIn) {
             var member = memberService.findMyInfo(loginMemberId);
-            isWriter = board.getWriter().equals(member.getUsername());
+            String loginUsername = member.getUsername();
+            isWriter = board.getWriter().equals(loginUsername);
+            model.addAttribute("loginUsername", loginUsername);
         }
 
         model.addAttribute("board", board);

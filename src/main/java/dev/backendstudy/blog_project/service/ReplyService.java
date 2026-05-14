@@ -37,6 +37,12 @@ public class ReplyService {
         return replyId;
     }
 
+    public boolean isWriter(Long replyId, String username) {
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("Reply not found. id=" + replyId));
+        return reply.getWriter().equals(username);
+    }
+
     public void deleteReply(Long replyId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("Reply not found. id=" + replyId));

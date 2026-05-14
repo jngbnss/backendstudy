@@ -33,7 +33,7 @@ public class MemberController {
         Member member = memberService.login(requestDto);
 
         session.setAttribute("loginMemberId", member.getId());
-        session.setAttribute("loginMemberEmail",member.getEmail());
+        session.setAttribute("loginId", member.getLoginId());
 
         return ResponseEntity.ok(member.getId());
     }

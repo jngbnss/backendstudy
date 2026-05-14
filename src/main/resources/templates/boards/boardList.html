@@ -13,7 +13,7 @@
       <p class="page-subtitle">작성된 글을 확인하고 새 글을 작성할 수 있습니다.</p>
     </div>
     <div class="actions">
-      <a th:if="${isLoggedIn}" th:href="@{/members/me}" class="btn btn-primary">프로필수정</a>
+      <a th:if="${isLoggedIn}" th:href="@{/members/me}" class="btn btn-primary">프로필 수정</a>
       <button th:if="${isLoggedIn}" type="button" class="btn btn-secondary" onclick="logout()">로그아웃</button>
       <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn btn-primary">로그인</a>
       <a th:unless="${isLoggedIn}" th:href="@{/signup}" class="btn btn-purple">회원가입</a>

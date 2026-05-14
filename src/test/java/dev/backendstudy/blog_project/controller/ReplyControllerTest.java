@@ -9,7 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
 import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
+import dev.backendstudy.blog_project.entity.Member;
+import dev.backendstudy.blog_project.service.MemberService;
 import dev.backendstudy.blog_project.service.ReplyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,9 @@ class ReplyControllerTest {
     @MockitoBean
     private ReplyService replyService;
 
+    @MockitoBean
+    private MemberService memberService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -34,11 +40,14 @@ class ReplyControllerTest {
     @DisplayName("create reply")
     void createReply() throws Exception {
         Long boardId = 1L;
+        Long memberId = 1L;
         ReplyRequestDto requestDto = new ReplyRequestDto("reply content", "writer");
+        given(memberService.findMyInfo(memberId)).willReturn(new MemberResponseDto(new Member("writer", "writerId", "password")));
         given(replyService.saveReply(any(), any())).willReturn(10L);
 
         mockMvc.perform(post("/api/boards/{boardId}/replies", boardId)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .sessionAttr("loginMemberId", memberId)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("10"));
@@ -48,11 +57,15 @@ class ReplyControllerTest {
     @DisplayName("update reply")
     void updateReply() throws Exception {
         Long replyId = 1L;
+        Long memberId = 1L;
         ReplyRequestDto requestDto = new ReplyRequestDto("updated content", "writer");
+        given(memberService.findMyInfo(memberId)).willReturn(new MemberResponseDto(new Member("writer", "writerId", "password")));
+        given(replyService.isWriter(replyId, "writer")).willReturn(true);
         given(replyService.updateReply(any(), any())).willReturn(replyId);
 
         mockMvc.perform(put("/api/replies/{replyId}", replyId)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .sessionAttr("loginMemberId", memberId)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("1"));
@@ -62,8 +75,12 @@ class ReplyControllerTest {
     @DisplayName("delete reply")
     void deleteReply() throws Exception {
         Long replyId = 1L;
+        Long memberId = 1L;
+        given(memberService.findMyInfo(memberId)).willReturn(new MemberResponseDto(new Member("writer", "writerId", "password")));
+        given(replyService.isWriter(replyId, "writer")).willReturn(true);
 
-        mockMvc.perform(delete("/api/replies/{replyId}", replyId))
+        mockMvc.perform(delete("/api/replies/{replyId}", replyId)
+                        .sessionAttr("loginMemberId", memberId))
                 .andExpect(status().isNoContent());
     }
 }
