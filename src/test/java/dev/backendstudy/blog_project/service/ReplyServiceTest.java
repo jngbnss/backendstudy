@@ -10,6 +10,7 @@ import dev.backendstudy.blog_project.entity.Board;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.entity.Reply;
 import dev.backendstudy.blog_project.repository.BoardRepository;
+import dev.backendstudy.blog_project.repository.MemberRepository;
 import dev.backendstudy.blog_project.repository.ReplyRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +31,12 @@ class ReplyServiceTest {
 
     @Mock
     private BoardRepository boardRepository;
+
+    @Mock
+    private MemberRepository memberRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @Test
     @DisplayName("save reply")

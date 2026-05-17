@@ -2,6 +2,7 @@ package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.service.BoardService;
 import dev.backendstudy.blog_project.service.MemberService;
+import dev.backendstudy.blog_project.service.NotificationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class BlogViewController {
     private final BoardService boardService;
     private final MemberService memberService;
+    private final NotificationService notificationService;
 
     @GetMapping
     public String getBoardList(
@@ -38,7 +40,7 @@ public class BlogViewController {
         model.addAttribute("sort", sort);
         model.addAttribute("pageTitle", "게시글 목록");
         model.addAttribute("listPath", "/boards");
-        model.addAttribute("isLoggedIn", session.getAttribute("loginMemberId") != null);
+        addLoginAttributes(model, session);
         return "boards/boardList";
     }
 
@@ -65,7 +67,7 @@ public class BlogViewController {
         model.addAttribute("sort", sort);
         model.addAttribute("pageTitle", "내가 작성한 글");
         model.addAttribute("listPath", "/boards/my");
-        model.addAttribute("isLoggedIn", true);
+        addLoginAttributes(model, session);
         return "boards/boardList";
     }
 
@@ -87,6 +89,7 @@ public class BlogViewController {
         model.addAttribute("isLoggedIn", isLoggedIn);
         model.addAttribute("isWriter", isWriter);
         model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("unreadNotificationCount", notificationService.countUnread(loginMemberId));
         return "boards/boardDetail";
     }
 
@@ -104,6 +107,7 @@ public class BlogViewController {
         }
 
         model.addAttribute("board", board);
+        model.addAttribute("unreadNotificationCount", notificationService.countUnread(loginMemberId));
         return "boards/boardUpdate";
     }
 
@@ -112,7 +116,15 @@ public class BlogViewController {
         Long loginMemberId = (Long) session.getAttribute("loginMemberId");
         model.addAttribute("isLoggedIn", loginMemberId != null);
         model.addAttribute("isAdmin", loginMemberId != null && memberService.isAdmin(loginMemberId));
+        model.addAttribute("unreadNotificationCount", notificationService.countUnread(loginMemberId));
         return "boards/boardWrite";
+    }
+
+    private void addLoginAttributes(Model model, HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+        model.addAttribute("isLoggedIn", loginMemberId != null);
+        model.addAttribute("isAdmin", loginMemberId != null && memberService.isAdmin(loginMemberId));
+        model.addAttribute("unreadNotificationCount", notificationService.countUnread(loginMemberId));
     }
 
     private Sort createSort(String sort) {

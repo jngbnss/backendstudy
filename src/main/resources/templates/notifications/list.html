@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a th:href="@{/boards}" class="brand">Board</a>
+    <nav class="site-nav">
+      <a th:href="@{/boards}">List</a>
+      <a th:href="@{/boards/my}">My posts</a>
+      <a th:href="@{/notifications}">
+        Notifications
+        <span class="notification-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+      </a>
+      <a th:href="@{/members/me}">Profile</a>
+      <button type="button" class="nav-button" onclick="logout()">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">Notifications</h1>
+      <p class="page-subtitle">Comments and replies related to your posts.</p>
+    </div>
+  </div>
+
+  <section class="panel table-wrap">
+    <table class="table">
+      <thead><tr><th>Status</th><th>Message</th><th>Board</th><th>Sender</th><th>Action</th></tr></thead>
+      <tbody>
+      <tr th:if="${#lists.isEmpty(notifications)}">
+        <td colspan="5" class="empty">No notifications.</td>
+      </tr>
+      <tr th:each="notification : ${notifications}" th:classappend="${notification.read} ? '' : ' unread-row'">
+        <td th:text="${notification.read ? 'Read' : 'Unread'}">Unread</td>
+        <td th:text="${notification.message}">message</td>
+        <td><a class="title-link" th:href="@{/boards/{id}(id=${notification.boardId})}" th:text="${notification.boardTitle}">Board</a></td>
+        <td th:text="${notification.sender}">Sender</td>
+        <td>
+          <button th:if="${!notification.read}" type="button" class="btn btn-secondary"
+                  th:onclick="markAsRead([[${notification.id}]])">Read</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+  function markAsRead(id) {
+      fetch(`/api/notifications/${id}/read`, {method: 'PATCH'}).then(res => {
+          if (res.ok) {
+              location.reload();
+          }
+      });
+  }
+
+  function logout() {
+      fetch('/api/members/logout', {method: 'POST'}).then(res => {
+          if (res.ok) {
+              location.href = '/boards';
+          }
+      });
+  }
+</script>
+</body>
+</html>

@@ -21,6 +21,7 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     public List<ReplyResponseDto> findAllForAdmin() {
         return replyRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
@@ -38,7 +39,9 @@ public class ReplyService {
                 .board(board)
                 .build();
 
-        return replyRepository.save(reply).getId();
+        Reply savedReply = replyRepository.save(reply);
+        notificationService.notifyBoardReply(board, member);
+        return savedReply.getId();
     }
 
     public Long saveChildReply(Long boardId, Long parentReplyId, ReplyRequestDto requestDto, Member member) {
@@ -58,7 +61,9 @@ public class ReplyService {
                 .parentReply(parentReply)
                 .build();
 
-        return replyRepository.save(reply).getId();
+        Reply savedReply = replyRepository.save(reply);
+        notificationService.notifyReplyReply(parentReply.getMember(), member, board);
+        return savedReply.getId();
     }
 
     public Long updateReply(Long replyId, ReplyRequestDto requestDto) {

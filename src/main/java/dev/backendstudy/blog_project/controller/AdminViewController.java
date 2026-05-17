@@ -1,6 +1,7 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.service.MemberService;
+import dev.backendstudy.blog_project.service.NotificationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class AdminViewController {
     private final MemberService memberService;
+    private final NotificationService notificationService;
 
     @GetMapping("/admin")
     public String adminPage(HttpSession session, Model model) {
@@ -24,6 +26,7 @@ public class AdminViewController {
 
         model.addAttribute("isLoggedIn", true);
         model.addAttribute("isAdmin", true);
+        model.addAttribute("unreadNotificationCount", notificationService.countUnread(loginMemberId));
         return "admin/dashboard";
     }
 }

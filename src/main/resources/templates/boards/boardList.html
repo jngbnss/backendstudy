@@ -12,6 +12,11 @@
     <nav class="site-nav">
       <a th:href="@{/boards}">목록</a>
       <a th:if="${isLoggedIn}" th:href="@{/boards/my}">내 글</a>
+      <a th:if="${isLoggedIn}" th:href="@{/notifications}">
+        Notifications
+        <span class="notification-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+      </a>
+      <a th:if="${isAdmin}" th:href="@{/admin}">Admin</a>
       <a th:if="${isLoggedIn}" th:href="@{/members/me}">프로필</a>
       <button th:if="${isLoggedIn}" type="button" class="nav-button" onclick="logout()">로그아웃</button>
       <a th:unless="${isLoggedIn}" th:href="@{/login}">로그인</a>

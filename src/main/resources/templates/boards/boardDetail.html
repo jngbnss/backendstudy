@@ -6,6 +6,22 @@
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
+<header class="site-header">
+    <div class="site-header-inner">
+        <a th:href="@{/boards}" class="brand">Board</a>
+        <nav class="site-nav">
+            <a th:href="@{/boards}">List</a>
+            <a th:if="${isLoggedIn}" th:href="@{/boards/my}">My posts</a>
+            <a th:if="${isLoggedIn}" th:href="@{/notifications}">
+                Notifications
+                <span class="notification-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/admin}">Admin</a>
+            <a th:if="${isLoggedIn}" th:href="@{/members/me}">Profile</a>
+            <a th:unless="${isLoggedIn}" th:href="@{/login}">Login</a>
+        </nav>
+    </div>
+</header>
 <main class="page">
     <div class="topbar">
         <div>

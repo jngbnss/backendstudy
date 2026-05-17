@@ -2,6 +2,7 @@ package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
 import dev.backendstudy.blog_project.service.MemberService;
+import dev.backendstudy.blog_project.service.NotificationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class MemberViewController {
     private final MemberService memberService;
+    private final NotificationService notificationService;
 
     @GetMapping("/signup")
     public String signupPage(){
@@ -30,6 +32,7 @@ public class MemberViewController {
         if (loginMemberId != null) {
             MemberResponseDto member = memberService.findMyInfo(loginMemberId);
             model.addAttribute("member", member);
+            model.addAttribute("unreadNotificationCount", notificationService.countUnread(loginMemberId));
         }
 
         return "members/myProfile";

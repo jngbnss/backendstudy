@@ -6,6 +6,18 @@
   <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a th:href="@{/boards}" class="brand">Board</a>
+    <nav class="site-nav">
+      <a th:href="@{/boards}">List</a>
+      <a th:href="@{/notifications}">
+        Notifications
+        <span class="notification-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+      </a>
+    </nav>
+  </div>
+</header>
 <main class="page">
   <div class="topbar">
     <div>
