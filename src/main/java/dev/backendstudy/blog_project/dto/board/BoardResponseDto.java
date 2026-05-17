@@ -25,6 +25,7 @@ public class BoardResponseDto {
     private boolean liked;
     private boolean disliked;
     private List<ReplyResponseDto> replies;
+    private List<BoardAttachmentResponseDto> attachments;
 
     public BoardResponseDto(Board board) {
         this.id = board.getId();
@@ -45,6 +46,9 @@ public class BoardResponseDto {
         this.replies = board.getReplies().stream()
                 .filter(reply -> reply.getParentReply() == null)
                 .map(ReplyResponseDto::new)
+                .collect(Collectors.toList());
+        this.attachments = board.getAttachments().stream()
+                .map(BoardAttachmentResponseDto::new)
                 .collect(Collectors.toList());
     }
 

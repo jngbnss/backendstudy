@@ -247,6 +247,12 @@ input[readonly] {
   color: #111111;
 }
 
+.form-help {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -492,6 +498,57 @@ input[readonly] {
   border-radius: 6px;
   background: var(--surface-muted);
   white-space: pre-wrap;
+}
+
+.attachments {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.attachment-image {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+  aspect-ratio: 4 / 3;
+}
+
+.attachment-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.attachment-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.attachment-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.attachment-list a {
+  color: var(--accent-hover);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .reaction-bar {

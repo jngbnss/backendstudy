@@ -33,6 +33,11 @@
         <label for="content">Content</label>
         <textarea id="content" placeholder="Enter content"></textarea>
       </div>
+      <div class="form-group">
+        <label for="files">Attachments</label>
+        <input type="file" id="files" multiple>
+        <p class="form-help">Allowed: jpg, jpeg, png, gif, webp, pdf, txt, zip, doc, docx, xls, xlsx. Max 10MB each.</p>
+      </div>
       <div class="actions">
         <a th:href="@{/boards}" class="btn btn-secondary">취소</a>
         <button type="button" class="btn btn-primary" onclick="saveBoard()">글작성</button>
@@ -55,10 +60,12 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: title, content: content })
-      }).then(res => {
+      }).then(async res => {
           if (res.ok) {
+              const boardId = await res.json();
+              await uploadAttachments(boardId);
               alert('Saved.');
-              location.href = '/boards';
+              location.href = `/boards/${boardId}`;
           } else if (res.status === 401) {
               alert('로그인 후 글을 작성할 수 있습니다.');
               location.href = '/login';
@@ -66,6 +73,21 @@
               alert('Save failed.');
           }
       });
+  }
+
+  async function uploadAttachments(boardId) {
+      const files = document.getElementById('files').files;
+      if (!files.length) return;
+
+      const formData = new FormData();
+      Array.from(files).forEach(file => formData.append('files', file));
+      const response = await fetch(`/api/boards/${boardId}/attachments`, {
+          method: 'POST',
+          body: formData
+      });
+      if (!response.ok) {
+          alert('Attachment upload failed.');
+      }
   }
 </script>
 </body>

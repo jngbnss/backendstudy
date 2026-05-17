@@ -38,6 +38,25 @@
     <section class="panel">
         <div class="panel-body">
             <div class="content-box" th:text="${board.content}">Content</div>
+            <div class="attachments" th:if="${!#lists.isEmpty(board.attachments)}">
+                <div class="attachment-grid">
+                    <a th:each="attachment : ${board.attachments}"
+                       th:if="${attachment.image}"
+                       th:href="@{/api/attachments/{id}/download(id=${attachment.id})}"
+                       class="attachment-image">
+                        <img th:src="${attachment.fileUrl}" th:alt="${attachment.originalFilename}">
+                    </a>
+                </div>
+                <ul class="attachment-list">
+                    <li th:each="attachment : ${board.attachments}">
+                        <a th:href="@{/api/attachments/{id}/download(id=${attachment.id})}"
+                           th:text="${attachment.originalFilename}">file.txt</a>
+                        <span th:text="${'(' + attachment.size + ' bytes)'}">(0 bytes)</span>
+                        <button th:if="${isWriter}" type="button" class="text-link text-link-danger"
+                                th:onclick="deleteAttachment([[${attachment.id}]])">Delete</button>
+                    </li>
+                </ul>
+            </div>
             <div class="reaction-bar">
                 <button type="button"
                         class="reaction-btn"
@@ -267,6 +286,25 @@
                 alert('작성자만 삭제할 수 있습니다.');
             } else {
                 alert('삭제에 실패했습니다.');
+            }
+        });
+    }
+
+    function deleteAttachment(attachmentId) {
+        if (!confirm('Delete this attachment?')) return;
+
+        fetch(`/api/attachments/${attachmentId}`, {
+            method: 'DELETE'
+        }).then(res => {
+            if (res.ok || res.status === 204) {
+                location.reload();
+            } else if (res.status === 401) {
+                alert('Login is required.');
+                location.href = '/login';
+            } else if (res.status === 403) {
+                alert('You cannot delete this attachment.');
+            } else {
+                alert('Attachment delete failed.');
             }
         });
     }
