@@ -30,8 +30,8 @@
 
     <div class="reply-actions" th:id="'reply-btns-' + ${replyItem.id}">
         <a th:if="${isLoggedIn}" href="javascript:void(0)" class="text-link" th:onclick="toggleChildReply([[${replyItem.id}]])">답글</a>
-        <a th:if="${isLoggedIn and replyItem.writerId == loginMemberId}" href="javascript:void(0)" class="text-link" th:onclick="toggleEdit([[${replyItem.id}]])">수정</a>
-        <a th:if="${isLoggedIn and replyItem.writerId == loginMemberId}" href="javascript:void(0)" class="text-link text-link-danger" th:onclick="deleteReply([[${replyItem.id}]])">삭제</a>
+        <a th:if="${isLoggedIn and (replyItem.writerId == loginMemberId or isAdmin)}" href="javascript:void(0)" class="text-link" th:onclick="toggleEdit([[${replyItem.id}]])">수정</a>
+        <a th:if="${isLoggedIn and (replyItem.writerId == loginMemberId or isAdmin)}" href="javascript:void(0)" class="text-link text-link-danger" th:onclick="deleteReply([[${replyItem.id}]])">삭제</a>
     </div>
 
     <div th:id="'child-form-' + ${replyItem.id}" class="child-reply-form">

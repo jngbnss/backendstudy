@@ -5,6 +5,7 @@ import dev.backendstudy.blog_project.entity.Board;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.entity.Reply;
 import dev.backendstudy.blog_project.repository.BoardRepository;
+import dev.backendstudy.blog_project.repository.MemberRepository;
 import dev.backendstudy.blog_project.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository;
 
     public Long saveReply(Long boardId, ReplyRequestDto requestDto, Member member) {
         Board board = boardRepository.findById(boardId)
@@ -62,6 +64,14 @@ public class ReplyService {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("Reply not found. id=" + replyId));
         return reply.getWriterId().equals(memberId);
+    }
+
+    public boolean canManage(Long replyId, Long memberId) {
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("Reply not found. id=" + replyId));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found. id=" + memberId));
+        return reply.getWriterId().equals(memberId) || member.isAdmin();
     }
 
     public void deleteReply(Long replyId) {

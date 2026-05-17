@@ -8,6 +8,7 @@ import dev.backendstudy.blog_project.entity.BoardReaction;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.repository.BoardRepository;
 import dev.backendstudy.blog_project.repository.BoardReactionRepository;
+import dev.backendstudy.blog_project.repository.MemberRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardReactionRepository boardReactionRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public Long save(BoardRequestDto requestDto, Member member) {
@@ -101,6 +103,14 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + id));
         return board.getWriterId().equals(memberId);
+    }
+
+    public boolean canManage(Long id, Long memberId) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + id));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found. id=" + memberId));
+        return board.getWriterId().equals(memberId) || member.isAdmin();
     }
 
     @Transactional

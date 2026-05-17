@@ -2,6 +2,8 @@ package dev.backendstudy.blog_project.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,12 +30,21 @@ public class Member {
     @Column(length = 500)
     private String profileImageUrl;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private MemberRole role = MemberRole.USER;
+
     private boolean deleted;
 
     public Member(String username, String loginId, String password) {
         this.username = username;
         this.loginId = loginId;
         this.password = password;
+    }
+
+    public Member(String username, String loginId, String password, MemberRole role) {
+        this(username, loginId, password);
+        this.role = role;
     }
 
     public void updateUsername(String username) {
@@ -46,7 +57,11 @@ public class Member {
     }
 
     public boolean isAdmin() {
-        return "admin".equals(this.loginId);
+        return this.role == MemberRole.ADMIN;
+    }
+
+    public void updateRole(MemberRole role) {
+        this.role = role;
     }
 
     public void withdraw() {

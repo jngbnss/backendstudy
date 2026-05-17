@@ -71,7 +71,7 @@ public class ReplyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!replyService.isWriter(replyId, loginMemberId)) {
+        if (!replyService.canManage(replyId, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -86,7 +86,7 @@ public class ReplyController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!replyService.isWriter(replyId, loginMemberId)) {
+        if (!replyService.canManage(replyId, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

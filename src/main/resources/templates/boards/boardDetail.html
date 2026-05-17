@@ -51,6 +51,11 @@
                         th:onclick="reactBoard([[${board.id}]], 'dislike')">
                     싫어요 <span th:text="${board.dislikeCount}">0</span>
                 </button>
+                <button th:if="${isLoggedIn and !isAdmin}" type="button"
+                        class="reaction-btn"
+                        th:onclick="reportBoard([[${board.id}]])">
+                    신고
+                </button>
             </div>
         </div>
     </section>
@@ -128,6 +133,26 @@
                 location.href = '/login';
             } else {
                 alert('Save failed.');
+            }
+        });
+    }
+
+    function reportBoard(boardId) {
+        const reason = prompt('신고 사유를 입력하세요.');
+        if (!reason || !reason.trim()) return;
+
+        fetch(`/api/boards/${boardId}/reports`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason })
+        }).then(res => {
+            if (res.ok) {
+                alert('신고가 접수되었습니다.');
+            } else if (res.status === 401) {
+                alert('로그인이 필요합니다.');
+                location.href = '/login';
+            } else {
+                alert('신고 처리에 실패했습니다.');
             }
         });
     }

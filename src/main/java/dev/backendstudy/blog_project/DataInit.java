@@ -2,6 +2,7 @@ package dev.backendstudy.blog_project;
 
 import dev.backendstudy.blog_project.entity.Board;
 import dev.backendstudy.blog_project.entity.Member;
+import dev.backendstudy.blog_project.entity.MemberRole;
 import dev.backendstudy.blog_project.entity.Reply;
 import dev.backendstudy.blog_project.repository.BoardRepository;
 import dev.backendstudy.blog_project.repository.MemberRepository;
@@ -33,7 +34,7 @@ public class DataInit implements CommandLineRunner {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         Member member1 = memberRepository.save(
-                new Member("관리자", "admin", encoder.encode("1"))
+                new Member("관리자", "admin", encoder.encode("1"), MemberRole.ADMIN)
         );
 
         Member member2 = memberRepository.save(

@@ -7,6 +7,7 @@ import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import dev.backendstudy.blog_project.entity.Member;
+import dev.backendstudy.blog_project.entity.MemberRole;
 import dev.backendstudy.blog_project.repository.MemberRepository;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +49,37 @@ class BoardServiceTest {
         List<BoardResponseDto> all = boardService.findAll();
 
         assertThat(all.size()).isGreaterThanOrEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("admin can manage another member's board")
+    void canManage_adminCanManageOtherWriterBoard() {
+        Member writer = memberRepository.save(new Member("writer", "writerId", "password"));
+        Member admin = memberRepository.save(new Member("admin", "adminId", "password", MemberRole.ADMIN));
+        Long savedId = boardService.save(new BoardRequestDto("title", "content", null), writer);
+
+        assertThat(boardService.canManage(savedId, admin.getId())).isTrue();
+    }
+
+    @Test
+    @DisplayName("regular member cannot manage another member's board")
+    void canManage_userCannotManageOtherWriterBoard() {
+        Member writer = memberRepository.save(new Member("writer", "writerId", "password"));
+        Member other = memberRepository.save(new Member("other", "otherId", "password"));
+        Long savedId = boardService.save(new BoardRequestDto("title", "content", null), writer);
+
+        assertThat(boardService.canManage(savedId, other.getId())).isFalse();
+    }
+
+    @Test
+    @DisplayName("admin board is saved as notice")
+    void save_adminBoardIsNotice() {
+        Member admin = memberRepository.save(new Member("admin", "adminId", "password", MemberRole.ADMIN));
+
+        Long savedId = boardService.save(new BoardRequestDto("notice", "content", null), admin);
+
+        BoardResponseDto result = boardService.findById(savedId);
+        assertThat(result.isNotice()).isTrue();
     }
 
     @Test

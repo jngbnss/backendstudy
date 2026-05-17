@@ -5,7 +5,9 @@ import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
 import dev.backendstudy.blog_project.dto.member.MemberSignupRequestDto;
 import dev.backendstudy.blog_project.dto.member.MemberUpdateRequestDto;
 import dev.backendstudy.blog_project.entity.Member;
+import dev.backendstudy.blog_project.entity.MemberRole;
 import dev.backendstudy.blog_project.repository.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -59,6 +61,23 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
         return member;
+    }
+
+    public boolean isAdmin(Long memberId) {
+        return findMember(memberId).isAdmin();
+    }
+
+    public List<MemberResponseDto> findAllActiveMembers() {
+        return memberRepository.findByDeletedFalse().stream()
+                .map(MemberResponseDto::new)
+                .toList();
+    }
+
+    @Transactional
+    public void updateRole(Long memberId, MemberRole role) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("?뚯썝??議댁옱?섏? ?딆뒿?덈떎."));
+        member.updateRole(role);
     }
 
     @Transactional

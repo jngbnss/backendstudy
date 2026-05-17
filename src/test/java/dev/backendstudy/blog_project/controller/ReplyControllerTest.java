@@ -60,7 +60,7 @@ class ReplyControllerTest {
         Long replyId = 1L;
         Long memberId = 1L;
         ReplyRequestDto requestDto = new ReplyRequestDto("updated content", "writer");
-        given(replyService.isWriter(replyId, memberId)).willReturn(true);
+        given(replyService.canManage(replyId, memberId)).willReturn(true);
         given(replyService.updateReply(any(), any())).willReturn(replyId);
 
         mockMvc.perform(put("/api/replies/{replyId}", replyId)
@@ -76,7 +76,7 @@ class ReplyControllerTest {
     void deleteReply() throws Exception {
         Long replyId = 1L;
         Long memberId = 1L;
-        given(replyService.isWriter(replyId, memberId)).willReturn(true);
+        given(replyService.canManage(replyId, memberId)).willReturn(true);
 
         mockMvc.perform(delete("/api/replies/{replyId}", replyId)
                         .sessionAttr("loginMemberId", memberId))

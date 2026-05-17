@@ -1,10 +1,12 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
+import dev.backendstudy.blog_project.dto.board.BoardReportRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import dev.backendstudy.blog_project.entity.BoardReaction;
 import dev.backendstudy.blog_project.entity.Member;
+import dev.backendstudy.blog_project.service.BoardReportService;
 import dev.backendstudy.blog_project.service.BoardService;
 import dev.backendstudy.blog_project.service.MemberService;
 import jakarta.servlet.http.HttpSession;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BoardController {
     private final BoardService boardService;
     private final MemberService memberService;
+    private final BoardReportService boardReportService;
 
     @PostMapping
     public ResponseEntity<Long> createdBoard(@RequestBody BoardRequestDto requestDto, HttpSession session) {
@@ -63,7 +66,7 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!boardService.isWriter(id, loginMemberId)) {
+        if (!boardService.canManage(id, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -79,7 +82,7 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!boardService.isWriter(id, loginMemberId)) {
+        if (!boardService.canManage(id, loginMemberId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -95,6 +98,23 @@ public class BoardController {
     @PostMapping("/{id}/dislike")
     public ResponseEntity<Void> dislikeBoard(@PathVariable Long id, HttpSession session) {
         return react(id, session, BoardReaction.DISLIKE);
+    }
+
+    @PostMapping("/{id}/reports")
+    public ResponseEntity<Long> reportBoard(
+            @PathVariable Long id,
+            @RequestBody BoardReportRequestDto requestDto,
+            HttpSession session
+    ) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Member member = memberService.findMember(loginMemberId);
+        Long reportId = boardReportService.report(id, requestDto, member);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportId);
     }
 
     private ResponseEntity<Void> react(Long id, HttpSession session, String reactionType) {

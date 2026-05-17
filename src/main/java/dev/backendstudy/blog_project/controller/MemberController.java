@@ -35,6 +35,7 @@ public class MemberController {
 
         session.setAttribute("loginMemberId", member.getId());
         session.setAttribute("loginId", member.getLoginId());
+        session.setAttribute("role", member.getRole().name());
 
         return ResponseEntity.ok(member.getId());
     }

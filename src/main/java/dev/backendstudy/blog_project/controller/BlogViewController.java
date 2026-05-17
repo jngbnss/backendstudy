@@ -75,15 +75,18 @@ public class BlogViewController {
         var board = boardService.findByIdForView(boardId, loginMemberId);
         boolean isLoggedIn = loginMemberId != null;
         boolean isWriter = false;
+        boolean isAdmin = false;
 
         if (isLoggedIn) {
-            isWriter = board.getWriterId().equals(loginMemberId);
+            isAdmin = memberService.isAdmin(loginMemberId);
+            isWriter = board.getWriterId().equals(loginMemberId) || isAdmin;
             model.addAttribute("loginMemberId", loginMemberId);
         }
 
         model.addAttribute("board", board);
         model.addAttribute("isLoggedIn", isLoggedIn);
         model.addAttribute("isWriter", isWriter);
+        model.addAttribute("isAdmin", isAdmin);
         return "boards/boardDetail";
     }
 
@@ -96,7 +99,7 @@ public class BlogViewController {
         }
 
         var board = boardService.findById(boardId);
-        if (!board.getWriterId().equals(loginMemberId)) {
+        if (!boardService.canManage(boardId, loginMemberId)) {
             return "redirect:/boards/" + boardId;
         }
 
@@ -106,7 +109,9 @@ public class BlogViewController {
 
     @GetMapping("/write")
     public String getWritePage(HttpSession session, Model model) {
-        model.addAttribute("isLoggedIn", session.getAttribute("loginMemberId") != null);
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+        model.addAttribute("isLoggedIn", loginMemberId != null);
+        model.addAttribute("isAdmin", loginMemberId != null && memberService.isAdmin(loginMemberId));
         return "boards/boardWrite";
     }
 
