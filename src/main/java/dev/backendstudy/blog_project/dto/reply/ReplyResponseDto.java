@@ -12,6 +12,8 @@ public class ReplyResponseDto {
     private String content;
     private String writer;
     private Long writerId;
+    private Long boardId;
+    private String boardTitle;
     private Long parentReplyId;
     private String writerProfileImageUrl;
     private LocalDateTime createdAt;
@@ -22,6 +24,8 @@ public class ReplyResponseDto {
         this.content = reply.getContent();
         this.writer = reply.getWriter();
         this.writerId = reply.getWriterId();
+        this.boardId = reply.getBoard() == null ? null : reply.getBoard().getId();
+        this.boardTitle = reply.getBoard() == null ? null : reply.getBoard().getTitle();
         this.parentReplyId = reply.getParentReply() == null ? null : reply.getParentReply().getId();
         this.writerProfileImageUrl = reply.getWriterProfileImageUrl();
         this.createdAt = reply.getCreatedAt();

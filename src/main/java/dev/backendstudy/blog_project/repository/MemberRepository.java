@@ -11,4 +11,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByLoginId(String loginId);
     Optional<Member> findByLoginIdAndDeletedFalse(String loginId);
     List<Member> findByDeletedFalse();
+    List<Member> findByDeletedTrue();
 }

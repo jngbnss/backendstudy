@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a th:href="@{/boards}" class="brand">Board</a>
+    <nav class="site-nav">
+      <a th:href="@{/boards}">List</a>
+      <a th:href="@{/admin}">Admin</a>
+      <button type="button" class="nav-button" onclick="logout()">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main class="page admin-page">
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">Admin</h1>
+      <p class="page-subtitle">Members, boards, replies, notices, reports, and withdrawn accounts.</p>
+    </div>
+  </div>
+
+  <section class="admin-summary">
+    <div class="summary-tile">
+      <span>Members</span>
+      <strong id="memberCount">0</strong>
+    </div>
+    <div class="summary-tile">
+      <span>Boards</span>
+      <strong id="boardCount">0</strong>
+    </div>
+    <div class="summary-tile">
+      <span>Replies</span>
+      <strong id="replyCount">0</strong>
+    </div>
+    <div class="summary-tile">
+      <span>Open reports</span>
+      <strong id="reportCount">0</strong>
+    </div>
+  </section>
+
+  <nav class="sort-tabs admin-tabs">
+    <button type="button" class="sort-tab active" data-tab="members">Members</button>
+    <button type="button" class="sort-tab" data-tab="boards">Boards</button>
+    <button type="button" class="sort-tab" data-tab="replies">Replies</button>
+    <button type="button" class="sort-tab" data-tab="reports">Reports</button>
+    <button type="button" class="sort-tab" data-tab="deleted">Withdrawn</button>
+  </nav>
+
+  <section class="panel table-wrap admin-section" id="membersTab">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Name</th><th>Login ID</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="membersBody"></tbody>
+    </table>
+  </section>
+
+  <section class="panel table-wrap admin-section hidden" id="boardsTab">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Title</th><th>Writer</th><th>Notice</th><th>Likes</th><th>Action</th></tr></thead>
+      <tbody id="boardsBody"></tbody>
+    </table>
+  </section>
+
+  <section class="panel table-wrap admin-section hidden" id="repliesTab">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Board</th><th>Writer</th><th>Content</th><th>Action</th></tr></thead>
+      <tbody id="repliesBody"></tbody>
+    </table>
+  </section>
+
+  <section class="panel table-wrap admin-section hidden" id="reportsTab">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Board</th><th>Reporter</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="reportsBody"></tbody>
+    </table>
+  </section>
+
+  <section class="panel table-wrap admin-section hidden" id="deletedTab">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Name</th><th>Login ID</th><th>Role</th><th>Status</th></tr></thead>
+      <tbody id="deletedBody"></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+  const tabs = ['members', 'boards', 'replies', 'reports', 'deleted'];
+
+  document.querySelectorAll('[data-tab]').forEach(button => {
+      button.addEventListener('click', () => {
+          document.querySelectorAll('[data-tab]').forEach(item => item.classList.remove('active'));
+          button.classList.add('active');
+          tabs.forEach(tab => document.getElementById(`${tab}Tab`).classList.add('hidden'));
+          document.getElementById(`${button.dataset.tab}Tab`).classList.remove('hidden');
+      });
+  });
+
+  function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[char]));
+  }
+
+  function emptyRow(colspan, message) {
+      return `<tr><td colspan="${colspan}" class="empty">${message}</td></tr>`;
+  }
+
+  async function loadJson(url) {
+      const response = await fetch(url);
+      if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+      }
+      return response.json();
+  }
+
+  async function request(url, options = {}) {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+          alert(`Request failed: ${response.status}`);
+          return false;
+      }
+      return true;
+  }
+
+  async function loadMembers() {
+      const members = await loadJson('/api/admin/members?includeDeleted=true');
+      document.getElementById('memberCount').textContent = members.length;
+      document.getElementById('membersBody').innerHTML = members.length ? members.map(member => `
+          <tr>
+            <td>${member.id}</td>
+            <td>${escapeHtml(member.username)}</td>
+            <td>${escapeHtml(member.loginId)}</td>
+            <td>
+              <select data-role-member="${member.id}" ${member.deleted ? 'disabled' : ''}>
+                <option value="USER" ${member.role === 'USER' ? 'selected' : ''}>USER</option>
+                <option value="ADMIN" ${member.role === 'ADMIN' ? 'selected' : ''}>ADMIN</option>
+              </select>
+            </td>
+            <td>${member.deleted ? 'Withdrawn' : 'Active'}</td>
+            <td>
+              <button class="btn btn-danger" type="button" onclick="withdrawMember(${member.id})" ${member.deleted ? 'disabled' : ''}>Withdraw</button>
+            </td>
+          </tr>
+      `).join('') : emptyRow(6, 'No members.');
+
+      document.querySelectorAll('[data-role-member]').forEach(select => {
+          select.addEventListener('change', async () => {
+              await request(`/api/admin/members/${select.dataset.roleMember}/role?role=${select.value}`, {method: 'PATCH'});
+              await loadMembers();
+          });
+      });
+  }
+
+  async function loadBoards() {
+      const boards = await loadJson('/api/admin/boards');
+      document.getElementById('boardCount').textContent = boards.length;
+      document.getElementById('boardsBody').innerHTML = boards.length ? boards.map(board => `
+          <tr>
+            <td>${board.id}</td>
+            <td><a class="title-link" href="/boards/${board.id}">${escapeHtml(board.title)}</a></td>
+            <td>${escapeHtml(board.writer)}</td>
+            <td>${board.notice ? 'Yes' : 'No'}</td>
+            <td>${board.likeCount}</td>
+            <td class="admin-actions">
+              <button class="btn btn-secondary" type="button" onclick="toggleNotice(${board.id}, ${!board.notice})">${board.notice ? 'Unset' : 'Notice'}</button>
+              <button class="btn btn-danger" type="button" onclick="deleteBoard(${board.id})">Delete</button>
+            </td>
+          </tr>
+      `).join('') : emptyRow(6, 'No boards.');
+  }
+
+  async function loadReplies() {
+      const replies = await loadJson('/api/admin/replies');
+      document.getElementById('replyCount').textContent = replies.length;
+      document.getElementById('repliesBody').innerHTML = replies.length ? replies.map(reply => `
+          <tr>
+            <td>${reply.id}</td>
+            <td><a class="title-link" href="/boards/${reply.boardId}">${escapeHtml(reply.boardTitle)}</a></td>
+            <td>${escapeHtml(reply.writer)}</td>
+            <td>${escapeHtml(reply.content)}</td>
+            <td><button class="btn btn-danger" type="button" onclick="deleteReply(${reply.id})">Delete</button></td>
+          </tr>
+      `).join('') : emptyRow(5, 'No replies.');
+  }
+
+  async function loadReports() {
+      const reports = await loadJson('/api/admin/reports');
+      const openReports = reports.filter(report => !report.resolved);
+      document.getElementById('reportCount').textContent = openReports.length;
+      document.getElementById('reportsBody').innerHTML = reports.length ? reports.map(report => `
+          <tr>
+            <td>${report.id}</td>
+            <td><a class="title-link" href="/boards/${report.boardId}">${escapeHtml(report.boardTitle)}</a></td>
+            <td>${escapeHtml(report.reporterUsername)}</td>
+            <td>${escapeHtml(report.reason)}</td>
+            <td>${report.resolved ? 'Resolved' : 'Open'}</td>
+            <td class="admin-actions">
+              <button class="btn btn-secondary" type="button" onclick="resolveReport(${report.id})" ${report.resolved ? 'disabled' : ''}>Resolve</button>
+              <button class="btn btn-danger" type="button" onclick="deleteBoard(${report.boardId})">Delete board</button>
+            </td>
+          </tr>
+      `).join('') : emptyRow(6, 'No reports.');
+  }
+
+  async function loadDeletedMembers() {
+      const members = await loadJson('/api/admin/members/deleted');
+      document.getElementById('deletedBody').innerHTML = members.length ? members.map(member => `
+          <tr>
+            <td>${member.id}</td>
+            <td>${escapeHtml(member.username)}</td>
+            <td>${escapeHtml(member.loginId)}</td>
+            <td>${member.role}</td>
+            <td>Withdrawn</td>
+          </tr>
+      `).join('') : emptyRow(5, 'No withdrawn members.');
+  }
+
+  async function refreshAll() {
+      await Promise.all([loadMembers(), loadBoards(), loadReplies(), loadReports(), loadDeletedMembers()]);
+  }
+
+  async function withdrawMember(id) {
+      if (confirm('Withdraw this member?') && await request(`/api/admin/members/${id}`, {method: 'DELETE'})) {
+          await refreshAll();
+      }
+  }
+
+  async function toggleNotice(id, notice) {
+      if (await request(`/api/admin/boards/${id}/notice?notice=${notice}`, {method: 'PATCH'})) {
+          await loadBoards();
+      }
+  }
+
+  async function deleteBoard(id) {
+      if (confirm('Delete this board?') && await request(`/api/admin/boards/${id}`, {method: 'DELETE'})) {
+          await refreshAll();
+      }
+  }
+
+  async function deleteReply(id) {
+      if (confirm('Delete this reply?') && await request(`/api/admin/replies/${id}`, {method: 'DELETE'})) {
+          await loadReplies();
+      }
+  }
+
+  async function resolveReport(id) {
+      if (await request(`/api/admin/reports/${id}/resolve`, {method: 'PATCH'})) {
+          await loadReports();
+      }
+  }
+
+  function logout() {
+      fetch('/api/members/logout', {method: 'POST'}).then(res => {
+          if (res.ok) {
+              location.href = '/boards';
+          }
+      });
+  }
+
+  refreshAll().catch(error => alert(error.message));
+</script>
+</body>
+</html>

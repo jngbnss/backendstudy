@@ -11,6 +11,7 @@ public class MemberResponseDto {
     private String loginId;
     private String profileImageUrl;
     private MemberRole role;
+    private boolean deleted;
 
     public MemberResponseDto(Member member) {
         this.id = member.getId();
@@ -18,5 +19,6 @@ public class MemberResponseDto {
         this.loginId = member.getLoginId();
         this.profileImageUrl = member.getProfileImageUrl();
         this.role = member.getRole();
+        this.deleted = member.isDeleted();
     }
 }

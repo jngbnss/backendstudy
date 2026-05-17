@@ -73,6 +73,18 @@ public class MemberService {
                 .toList();
     }
 
+    public List<MemberResponseDto> findAllMembers() {
+        return memberRepository.findAll().stream()
+                .map(MemberResponseDto::new)
+                .toList();
+    }
+
+    public List<MemberResponseDto> findDeletedMembers() {
+        return memberRepository.findByDeletedTrue().stream()
+                .map(MemberResponseDto::new)
+                .toList();
+    }
+
     @Transactional
     public void updateRole(Long memberId, MemberRole role) {
         Member member = memberRepository.findById(memberId)

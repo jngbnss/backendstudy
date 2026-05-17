@@ -1,13 +1,16 @@
 package dev.backendstudy.blog_project.service;
 
 import dev.backendstudy.blog_project.dto.reply.ReplyRequestDto;
+import dev.backendstudy.blog_project.dto.reply.ReplyResponseDto;
 import dev.backendstudy.blog_project.entity.Board;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.entity.Reply;
 import dev.backendstudy.blog_project.repository.BoardRepository;
 import dev.backendstudy.blog_project.repository.MemberRepository;
 import dev.backendstudy.blog_project.repository.ReplyRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,12 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+
+    public List<ReplyResponseDto> findAllForAdmin() {
+        return replyRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
+                .map(ReplyResponseDto::new)
+                .toList();
+    }
 
     public Long saveReply(Long boardId, ReplyRequestDto requestDto, Member member) {
         Board board = boardRepository.findById(boardId)

@@ -92,6 +92,10 @@ public class Board {
         this.notice = true;
     }
 
+    public void updateNotice(boolean notice) {
+        this.notice = notice;
+    }
+
     public void increaseViewCount() {
         this.viewCount++;
     }

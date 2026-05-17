@@ -1,11 +1,14 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.dto.board.BoardReportResponseDto;
+import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.member.MemberResponseDto;
+import dev.backendstudy.blog_project.dto.reply.ReplyResponseDto;
 import dev.backendstudy.blog_project.entity.MemberRole;
 import dev.backendstudy.blog_project.service.BoardReportService;
 import dev.backendstudy.blog_project.service.BoardService;
 import dev.backendstudy.blog_project.service.MemberService;
+import dev.backendstudy.blog_project.service.ReplyService;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +29,30 @@ public class AdminController {
     private final MemberService memberService;
     private final BoardService boardService;
     private final BoardReportService boardReportService;
+    private final ReplyService replyService;
 
     @GetMapping("/members")
-    public ResponseEntity<List<MemberResponseDto>> getMembers(HttpSession session) {
+    public ResponseEntity<List<MemberResponseDto>> getMembers(
+            @RequestParam(defaultValue = "false") boolean includeDeleted,
+            HttpSession session
+    ) {
         if (!isAdmin(session)) {
             return forbiddenOrUnauthorized(session);
         }
 
+        if (includeDeleted) {
+            return ResponseEntity.ok(memberService.findAllMembers());
+        }
         return ResponseEntity.ok(memberService.findAllActiveMembers());
+    }
+
+    @GetMapping("/members/deleted")
+    public ResponseEntity<List<MemberResponseDto>> getDeletedMembers(HttpSession session) {
+        if (!isAdmin(session)) {
+            return forbiddenOrUnauthorized(session);
+        }
+
+        return ResponseEntity.ok(memberService.findDeletedMembers());
     }
 
     @PatchMapping("/members/{memberId}/role")
@@ -67,6 +86,48 @@ public class AdminController {
         }
 
         return ResponseEntity.ok(boardReportService.findAll());
+    }
+
+    @GetMapping("/boards")
+    public ResponseEntity<List<BoardResponseDto>> getBoards(HttpSession session) {
+        if (!isAdmin(session)) {
+            return forbiddenOrUnauthorized(session);
+        }
+
+        return ResponseEntity.ok(boardService.findAllForAdmin());
+    }
+
+    @PatchMapping("/boards/{boardId}/notice")
+    public ResponseEntity<Void> updateNotice(
+            @PathVariable Long boardId,
+            @RequestParam boolean notice,
+            HttpSession session
+    ) {
+        if (!isAdmin(session)) {
+            return forbiddenOrUnauthorized(session);
+        }
+
+        boardService.updateNotice(boardId, notice);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/replies")
+    public ResponseEntity<List<ReplyResponseDto>> getReplies(HttpSession session) {
+        if (!isAdmin(session)) {
+            return forbiddenOrUnauthorized(session);
+        }
+
+        return ResponseEntity.ok(replyService.findAllForAdmin());
+    }
+
+    @DeleteMapping("/replies/{replyId}")
+    public ResponseEntity<Void> deleteReply(@PathVariable Long replyId, HttpSession session) {
+        if (!isAdmin(session)) {
+            return forbiddenOrUnauthorized(session);
+        }
+
+        replyService.deleteReply(replyId);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/reports/{reportId}/resolve")

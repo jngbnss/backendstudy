@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,12 @@ public class BoardService {
         return boardRepository.findAll().stream()
                 .map(BoardResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    public List<BoardResponseDto> findAllForAdmin() {
+        return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
+                .map(BoardResponseDto::new)
+                .toList();
     }
 
     public Page<BoardResponseDto> findPage(String keyword, Pageable pageable) {
@@ -118,6 +125,13 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + id));
         board.update(requestDto.title(), requestDto.content());
+    }
+
+    @Transactional
+    public void updateNotice(Long id, boolean notice) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + id));
+        board.updateNotice(notice);
     }
 
     @Transactional
