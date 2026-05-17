@@ -24,6 +24,7 @@ public class BoardResponseDto {
     private boolean notice;
     private boolean liked;
     private boolean disliked;
+    private boolean bookmarked;
     private List<ReplyResponseDto> replies;
     private List<BoardAttachmentResponseDto> attachments;
 
@@ -56,5 +57,10 @@ public class BoardResponseDto {
         this(board);
         this.liked = "LIKE".equals(reactionType);
         this.disliked = "DISLIKE".equals(reactionType);
+    }
+
+    public BoardResponseDto(Board board, String reactionType, boolean bookmarked) {
+        this(board, reactionType);
+        this.bookmarked = bookmarked;
     }
 }

@@ -25,6 +25,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardReactionRepository boardReactionRepository;
     private final MemberRepository memberRepository;
+    private final BoardBookmarkService boardBookmarkService;
 
     @Transactional
     public Long save(BoardRequestDto requestDto, Member member) {
@@ -103,7 +104,8 @@ public class BoardService {
                     .orElse(null);
         }
 
-        return new BoardResponseDto(board, reactionType);
+        boolean bookmarked = boardBookmarkService.isBookmarked(id, loginMemberId);
+        return new BoardResponseDto(board, reactionType, bookmarked);
     }
 
     public boolean isWriter(Long id, Long memberId) {

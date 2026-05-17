@@ -1,11 +1,13 @@
 package dev.backendstudy.blog_project.controller;
 
 import dev.backendstudy.blog_project.service.BoardService;
+import dev.backendstudy.blog_project.service.BoardBookmarkService;
 import dev.backendstudy.blog_project.service.MemberService;
 import dev.backendstudy.blog_project.service.NotificationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/boards")
 public class BlogViewController {
     private final BoardService boardService;
+    private final BoardBookmarkService boardBookmarkService;
     private final MemberService memberService;
     private final NotificationService notificationService;
 
@@ -67,6 +70,25 @@ public class BlogViewController {
         model.addAttribute("sort", sort);
         model.addAttribute("pageTitle", "내가 작성한 글");
         model.addAttribute("listPath", "/boards/my");
+        addLoginAttributes(model, session);
+        return "boards/boardList";
+    }
+
+    @GetMapping("/bookmarks")
+    public String getMyBookmarkList(Model model, HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+        if (loginMemberId == null) {
+            return "redirect:/login";
+        }
+
+        var boards = boardBookmarkService.findMyBookmarks(loginMemberId);
+        var boardPage = new PageImpl<>(boards);
+        model.addAttribute("boardPage", boardPage);
+        model.addAttribute("boards", boards);
+        model.addAttribute("keyword", "");
+        model.addAttribute("sort", "latest");
+        model.addAttribute("pageTitle", "Bookmarked posts");
+        model.addAttribute("listPath", "/boards/bookmarks");
         addLoginAttributes(model, session);
         return "boards/boardList";
     }

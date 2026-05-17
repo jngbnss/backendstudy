@@ -12,6 +12,7 @@
         <nav class="site-nav">
             <a th:href="@{/boards}">List</a>
             <a th:if="${isLoggedIn}" th:href="@{/boards/my}">My posts</a>
+            <a th:if="${isLoggedIn}" th:href="@{/boards/bookmarks}">Bookmarks</a>
             <a th:if="${isLoggedIn}" th:href="@{/notifications}">
                 Notifications
                 <span class="notification-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
@@ -90,6 +91,12 @@
                         class="reaction-btn"
                         th:onclick="reportBoard([[${board.id}]])">
                     신고
+                </button>
+                <button th:if="${isLoggedIn}" type="button"
+                        class="reaction-btn"
+                        th:classappend="${board.bookmarked} ? ' active'"
+                        th:onclick="bookmarkBoard([[${board.id}]])">
+                    Bookmark
                 </button>
             </div>
         </div>
@@ -188,6 +195,21 @@
                 location.href = '/login';
             } else {
                 alert('신고 처리에 실패했습니다.');
+            }
+        });
+    }
+
+    function bookmarkBoard(boardId) {
+        fetch(`/api/boards/${boardId}/bookmark`, {
+            method: 'POST'
+        }).then(res => {
+            if (res.ok) {
+                location.reload();
+            } else if (res.status === 401) {
+                alert('Login is required.');
+                location.href = '/login';
+            } else {
+                alert('Bookmark failed.');
             }
         });
     }

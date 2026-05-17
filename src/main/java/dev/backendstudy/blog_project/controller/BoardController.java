@@ -6,6 +6,7 @@ import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
 import dev.backendstudy.blog_project.entity.BoardReaction;
 import dev.backendstudy.blog_project.entity.Member;
+import dev.backendstudy.blog_project.service.BoardBookmarkService;
 import dev.backendstudy.blog_project.service.BoardReportService;
 import dev.backendstudy.blog_project.service.BoardService;
 import dev.backendstudy.blog_project.service.MemberService;
@@ -30,6 +31,7 @@ public class BoardController {
     private final BoardService boardService;
     private final MemberService memberService;
     private final BoardReportService boardReportService;
+    private final BoardBookmarkService boardBookmarkService;
 
     @PostMapping
     public ResponseEntity<Long> createdBoard(@RequestBody BoardRequestDto requestDto, HttpSession session) {
@@ -98,6 +100,17 @@ public class BoardController {
     @PostMapping("/{id}/dislike")
     public ResponseEntity<Void> dislikeBoard(@PathVariable Long id, HttpSession session) {
         return react(id, session, BoardReaction.DISLIKE);
+    }
+
+    @PostMapping("/{id}/bookmark")
+    public ResponseEntity<Boolean> bookmarkBoard(@PathVariable Long id, HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Member member = memberService.findMember(loginMemberId);
+        return ResponseEntity.ok(boardBookmarkService.toggle(id, member));
     }
 
     @PostMapping("/{id}/reports")

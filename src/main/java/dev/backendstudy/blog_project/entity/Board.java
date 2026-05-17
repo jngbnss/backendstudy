@@ -63,6 +63,9 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardAttachment> attachments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardBookmark> bookmarks = new ArrayList<>();
+
     public Board(String title, String content, Member member) {
         this.title = title;
         this.content = content;

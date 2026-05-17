@@ -11,6 +11,7 @@
     <a th:href="@{/boards}" class="brand">Board</a>
     <nav class="site-nav">
       <a th:href="@{/boards}">List</a>
+      <a th:if="${isLoggedIn}" th:href="@{/boards/bookmarks}">Bookmarks</a>
       <a th:if="${isLoggedIn}" th:href="@{/notifications}">
         Notifications
         <span class="notification-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
