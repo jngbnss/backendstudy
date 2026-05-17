@@ -35,10 +35,14 @@
                 <input type="password" id="password" placeholder="비밀번호를 입력하세요">
             </div>
 
-            <div class="actions">
-                <a th:href="@{/boards}" class="btn btn-secondary">취소</a>
-                <a th:href="@{/login}" class="btn btn-purple">로그인</a>
-                <button type="button" class="btn btn-primary" onclick="signup()">회원가입</button>
+            <div class="form-actions-split">
+                <div class="form-actions-left">
+                    <a th:href="@{/login}" class="btn btn-secondary">로그인</a>
+                </div>
+                <div class="form-actions-right">
+                    <a th:href="@{/boards}" class="btn btn-secondary">취소</a>
+                    <button type="button" class="btn btn-primary" onclick="signup()">회원가입</button>
+                </div>
             </div>
         </form>
     </section>

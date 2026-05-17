@@ -3,6 +3,7 @@ package dev.backendstudy.blog_project.controller;
 import dev.backendstudy.blog_project.dto.board.BoardRequestDto;
 import dev.backendstudy.blog_project.dto.board.BoardResponseDto;
 import dev.backendstudy.blog_project.dto.board.BoardUpdateDto;
+import dev.backendstudy.blog_project.entity.BoardReaction;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.service.BoardService;
 import dev.backendstudy.blog_project.service.MemberService;
@@ -83,6 +84,28 @@ public class BoardController {
         }
 
         boardService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> likeBoard(@PathVariable Long id, HttpSession session) {
+        return react(id, session, BoardReaction.LIKE);
+    }
+
+    @PostMapping("/{id}/dislike")
+    public ResponseEntity<Void> dislikeBoard(@PathVariable Long id, HttpSession session) {
+        return react(id, session, BoardReaction.DISLIKE);
+    }
+
+    private ResponseEntity<Void> react(Long id, HttpSession session, String reactionType) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Member member = memberService.findMember(loginMemberId);
+        boardService.react(id, member, reactionType);
         return ResponseEntity.ok().build();
     }
 }

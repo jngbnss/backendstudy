@@ -10,7 +10,7 @@
     <div class="topbar">
         <div>
             <h1 class="page-title">프로필 수정</h1>
-            <p class="page-subtitle">아이디는 변경할 수 없고 이름만 수정할 수 있습니다.</p>
+            <p class="page-subtitle">아이디는 변경할 수 없고 이름과 프로필 사진을 수정할 수 있습니다.</p>
         </div>
     </div>
 
@@ -26,9 +26,26 @@
                 <input type="text" id="username" th:value="${member != null ? member.username : ''}">
             </div>
 
+            <div class="form-group">
+                <label for="profileImage">프로필 사진</label>
+                <input type="file" id="profileImage" accept="image/*" onchange="previewProfileImage()">
+                <div class="profile-preview">
+                    <div class="avatar avatar-large">
+                        <img id="profilePreviewImage"
+                             th:src="${member != null ? member.profileImageUrl : ''}"
+                             th:style="${member != null and member.profileImageUrl != null and !#strings.isEmpty(member.profileImageUrl)} ? '' : 'display: none;'"
+                             alt="프로필 이미지">
+                        <span id="profilePreviewInitial"
+                              th:style="${member != null and member.profileImageUrl != null and !#strings.isEmpty(member.profileImageUrl)} ? 'display: none;' : ''"
+                              th:text="${member != null ? #strings.substring(member.username, 0, 1) : '?'}">?</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="actions">
                 <a th:href="@{/boards}" class="btn btn-secondary">뒤로가기</a>
                 <button type="button" class="btn btn-primary" onclick="updateProfile()">프로필 수정</button>
+                <button type="button" class="btn btn-danger" onclick="withdrawMember()">회원탈퇴</button>
             </div>
         </div>
     </section>
@@ -37,18 +54,22 @@
 <script>
     function updateProfile() {
         const username = document.getElementById('username').value;
+        const profileImage = document.getElementById('profileImage').files[0];
 
         if (!username) {
             alert('이름을 입력해주세요.');
             return;
         }
 
+        const formData = new FormData();
+        formData.append('username', username);
+        if (profileImage) {
+            formData.append('profileImage', profileImage);
+        }
+
         fetch('/api/members/me', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: username
-            })
+            body: formData
         }).then(res => {
             if (res.ok) {
                 alert('프로필이 수정되었습니다.');
@@ -57,6 +78,42 @@
                 alert('로그인 후 수정할 수 있습니다.');
             } else {
                 alert('수정에 실패했습니다.');
+            }
+        });
+    }
+
+    function previewProfileImage() {
+        const file = document.getElementById('profileImage').files[0];
+        const image = document.getElementById('profilePreviewImage');
+        const initial = document.getElementById('profilePreviewInitial');
+
+        if (!file) {
+            return;
+        }
+
+        if (image) {
+            image.src = URL.createObjectURL(file);
+            image.style.display = 'block';
+        }
+        initial.style.display = 'none';
+    }
+
+    function withdrawMember() {
+        if (!confirm('회원탈퇴 하시겠습니까? 기존 글과 댓글은 탈퇴한 회원입니다로 표시됩니다.')) {
+            return;
+        }
+
+        fetch('/api/members/me', {
+            method: 'DELETE'
+        }).then(res => {
+            if (res.ok || res.status === 204) {
+                alert('회원탈퇴가 완료되었습니다.');
+                location.href = '/boards';
+            } else if (res.status === 401) {
+                alert('로그인 후 탈퇴할 수 있습니다.');
+                location.href = '/login';
+            } else {
+                alert('회원탈퇴에 실패했습니다.');
             }
         });
     }

@@ -25,6 +25,11 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
+    @Column(length = 500)
+    private String profileImageUrl;
+
+    private boolean deleted;
+
     public Member(String username, String loginId, String password) {
         this.username = username;
         this.loginId = loginId;
@@ -33,5 +38,22 @@ public class Member {
 
     public void updateUsername(String username) {
         this.username = username;
+    }
+
+    public void updateProfile(String username, String profileImageUrl) {
+        this.username = username;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public boolean isAdmin() {
+        return "admin".equals(this.loginId);
+    }
+
+    public void withdraw() {
+        this.username = "탈퇴한 회원입니다";
+        this.loginId = "deleted_" + id;
+        this.password = "";
+        this.profileImageUrl = null;
+        this.deleted = true;
     }
 }

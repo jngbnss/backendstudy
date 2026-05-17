@@ -7,6 +7,7 @@ import dev.backendstudy.blog_project.dto.member.MemberUpdateRequestDto;
 import dev.backendstudy.blog_project.entity.Member;
 import dev.backendstudy.blog_project.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final ProfileImageStorageService profileImageStorageService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Transactional
     public Long signup(MemberSignupRequestDto requestDto) {
-        if (memberRepository.existsByLoginId(requestDto.getLoginId())) {
+        if (memberRepository.existsByLoginIdAndDeletedFalse(requestDto.getLoginId())) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
 
@@ -35,7 +37,7 @@ public class MemberService {
     }
 
     public Member login(MemberLoginRequestDto requestDto) {
-        Member member = memberRepository.findByLoginId(requestDto.getLoginId())
+        Member member = memberRepository.findByLoginIdAndDeletedFalse(requestDto.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다."));
 
         if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
@@ -46,7 +48,7 @@ public class MemberService {
     }
 
     public boolean isLoginIdAvailable(String loginId) {
-        return !memberRepository.existsByLoginId(loginId);
+        return !memberRepository.existsByLoginIdAndDeletedFalse(loginId);
     }
 
     public MemberResponseDto findMyInfo(Long memberId) {
@@ -60,10 +62,28 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateMyInfo(Long memberId, MemberUpdateRequestDto requestDto) {
+    public void updateMyInfo(Long memberId, String username, MultipartFile profileImage) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
-        member.updateUsername(requestDto.getUsername());
+        String profileImageUrl = member.getProfileImageUrl();
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageUrl = profileImageStorageService.store(profileImage);
+        }
+
+        member.updateProfile(username, profileImageUrl);
+    }
+
+    @Transactional
+    public void updateMyInfo(Long memberId, MemberUpdateRequestDto requestDto) {
+        updateMyInfo(memberId, requestDto.getUsername(), null);
+    }
+
+    @Transactional
+    public void withdraw(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        member.withdraw();
     }
 }

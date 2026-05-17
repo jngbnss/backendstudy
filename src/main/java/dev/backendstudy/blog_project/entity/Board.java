@@ -46,13 +46,29 @@ public class Board {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    private long viewCount;
+
+    private long likeCount;
+
+    private long dislikeCount;
+
+    private boolean notice;
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reply> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardReaction> reactions = new ArrayList<>();
 
     public Board(String title, String content, Member member) {
         this.title = title;
         this.content = content;
         this.member = member;
+    }
+
+    public Board(String title, String content, Member member, boolean notice) {
+        this(title, content, member);
+        this.notice = notice;
     }
 
     public String getWriter() {
@@ -63,8 +79,40 @@ public class Board {
         return member.getId();
     }
 
+    public String getWriterProfileImageUrl() {
+        return member.getProfileImageUrl();
+    }
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void markAsNotice() {
+        this.notice = true;
+    }
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
+
+    public void increaseDislikeCount() {
+        this.dislikeCount++;
+    }
+
+    public void decreaseDislikeCount() {
+        if (this.dislikeCount > 0) {
+            this.dislikeCount--;
+        }
     }
 }

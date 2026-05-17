@@ -30,6 +30,26 @@ public class ReplyService {
         return replyRepository.save(reply).getId();
     }
 
+    public Long saveChildReply(Long boardId, Long parentReplyId, ReplyRequestDto requestDto, Member member) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("Board not found. id=" + boardId));
+        Reply parentReply = replyRepository.findById(parentReplyId)
+                .orElseThrow(() -> new IllegalArgumentException("Reply not found. id=" + parentReplyId));
+
+        if (!parentReply.getBoard().getId().equals(board.getId())) {
+            throw new IllegalArgumentException("Parent reply does not belong to board. boardId=" + boardId);
+        }
+
+        Reply reply = Reply.builder()
+                .content(requestDto.getContent())
+                .member(member)
+                .board(board)
+                .parentReply(parentReply)
+                .build();
+
+        return replyRepository.save(reply).getId();
+    }
+
     public Long updateReply(Long replyId, ReplyRequestDto requestDto) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new IllegalArgumentException("Reply not found. id=" + replyId));

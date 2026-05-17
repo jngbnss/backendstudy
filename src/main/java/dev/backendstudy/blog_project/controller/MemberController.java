@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -69,14 +70,27 @@ public class MemberController {
 
     @PutMapping("/me")
     public ResponseEntity<Void>updateMyInfo(
-            @RequestBody MemberUpdateRequestDto requestDto,
+            @RequestParam String username,
+            @RequestParam(required = false) MultipartFile profileImage,
             HttpSession session
     ){
         Long loginMemberId = (Long) session.getAttribute("loginMemberId");
         if(loginMemberId==null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        memberService.updateMyInfo(loginMemberId,requestDto);
+        memberService.updateMyInfo(loginMemberId, username, profileImage);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void>withdraw(HttpSession session) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        memberService.withdraw(loginMemberId);
+        session.invalidate();
+        return ResponseEntity.noContent().build();
     }
 }

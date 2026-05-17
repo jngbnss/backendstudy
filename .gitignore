@@ -38,3 +38,6 @@ out/
 
 ### Local notes ###
 *.local.txt
+
+### Uploaded files ###
+uploads/

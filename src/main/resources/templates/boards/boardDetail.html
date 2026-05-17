@@ -10,7 +10,23 @@
     <div class="topbar">
         <div>
             <h1 class="page-title" th:text="${board.title}">Title</h1>
-            <p class="page-subtitle">작성자: <strong th:text="${board.writer}">Writer</strong></p>
+            <div class="author-line">
+                <div class="avatar">
+                    <img th:if="${board.writerProfileImageUrl != null and !#strings.isEmpty(board.writerProfileImageUrl)}"
+                         th:src="${board.writerProfileImageUrl}" alt="작성자 프로필">
+                    <span th:unless="${board.writerProfileImageUrl != null and !#strings.isEmpty(board.writerProfileImageUrl)}"
+                          th:text="${#strings.substring(board.writer, 0, 1)}">W</span>
+                </div>
+                <div>
+                    <p class="page-subtitle">작성자: <strong th:text="${board.writer}">Writer</strong></p>
+                    <div class="time-meta">
+                        <span th:text="${board.createdAt != null ? '작성 ' + #temporals.format(board.createdAt, 'yyyy.MM.dd HH:mm') : '작성 -'}">작성 2026.05.16 14:32</span>
+                        <span th:if="${board.modified}"
+                              th:text="${'수정됨 ' + #temporals.format(board.updatedAt, 'yyyy.MM.dd HH:mm')}">수정됨 2026.05.16 15:10</span>
+                        <span th:text="${'조회 ' + board.viewCount}">조회 0</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="actions">
             <a th:href="@{/boards}" class="btn btn-secondary">목록</a>
@@ -22,6 +38,20 @@
     <section class="panel">
         <div class="panel-body">
             <div class="content-box" th:text="${board.content}">Content</div>
+            <div class="reaction-bar">
+                <button type="button"
+                        class="reaction-btn"
+                        th:classappend="${board.liked} ? ' active'"
+                        th:onclick="reactBoard([[${board.id}]], 'like')">
+                    좋아요 <span th:text="${board.likeCount}">0</span>
+                </button>
+                <button type="button"
+                        class="reaction-btn"
+                        th:classappend="${board.disliked} ? ' active'"
+                        th:onclick="reactBoard([[${board.id}]], 'dislike')">
+                    싫어요 <span th:text="${board.dislikeCount}">0</span>
+                </button>
+            </div>
         </div>
     </section>
 
@@ -54,27 +84,30 @@
 
             <ul class="reply-list">
                 <li th:if="${#lists.isEmpty(board.replies)}" class="empty">아직 등록된 댓글이 없습니다.</li>
-                <li class="reply-item" th:each="reply : ${board.replies}" th:id="'reply-item-' + ${reply.id}">
-                    <div class="reply-author" th:text="${reply.writer}">Writer</div>
-                    <p class="reply-text" th:id="'reply-text-' + ${reply.id}" th:text="${reply.content}">Reply content</p>
-                    <div th:id="'edit-wrapper-' + ${reply.id}" class="edit-form">
-                        <textarea th:id="'edit-content-' + ${reply.id}" th:text="${reply.content}"></textarea>
-                        <div class="actions" style="justify-content: flex-start; margin-top: 8px;">
-                            <button class="btn btn-success" th:onclick="updateReply([[${reply.id}]])">수정</button>
-                            <button class="btn btn-secondary" th:onclick="toggleEdit([[${reply.id}]])">취소</button>
-                        </div>
-                    </div>
-                    <div th:if="${isLoggedIn and reply.writerId == loginMemberId}" class="reply-actions" th:id="'reply-btns-' + ${reply.id}">
-                        <a href="javascript:void(0)" class="text-link" th:onclick="toggleEdit([[${reply.id}]])">수정</a>
-                        <a href="javascript:void(0)" class="text-link text-link-danger" th:onclick="deleteReply([[${reply.id}]])">삭제</a>
-                    </div>
-                </li>
+                <th:block th:each="reply : ${board.replies}" th:with="replyItem=${reply}, boardId=${board.id}">
+                    <li th:replace="~{fragments/replyItem :: replyNode}"></li>
+                </th:block>
             </ul>
         </div>
     </section>
 </main>
 
 <script th:inline="javascript">
+    function reactBoard(boardId, reactionType) {
+        fetch(`/api/boards/${boardId}/${reactionType}`, {
+            method: 'POST'
+        }).then(res => {
+            if (res.ok) {
+                location.reload();
+            } else if (res.status === 401) {
+                alert('로그인 후 사용할 수 있습니다.');
+                location.href = '/login';
+            } else {
+                alert('처리에 실패했습니다.');
+            }
+        });
+    }
+
     function submitReply(boardId) {
         const content = document.getElementById('replyContent').value;
 
@@ -97,6 +130,39 @@
                 alert('Save failed.');
             }
         });
+    }
+
+    function submitChildReply(boardId, parentReplyId) {
+        const content = document.getElementById(`child-content-${parentReplyId}`).value;
+
+        if (!content.trim()) {
+            alert('답글 내용을 입력해주세요.');
+            return;
+        }
+
+        fetch(`/api/boards/${boardId}/replies/${parentReplyId}/children`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+        }).then(res => {
+            if (res.ok) {
+                location.reload();
+            } else if (res.status === 401) {
+                alert('로그인 후 답글을 작성할 수 있습니다.');
+                location.href = '/login';
+            } else {
+                alert('Save failed.');
+            }
+        });
+    }
+
+    function toggleChildReply(replyId) {
+        const form = document.getElementById(`child-form-${replyId}`);
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
     }
 
     function toggleEdit(replyId) {

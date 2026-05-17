@@ -9,4 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberUpdateRequestDto {
     private String username;
+    private String profileImageUrl;
+
+    public MemberUpdateRequestDto(String username) {
+        this.username = username;
+    }
 }

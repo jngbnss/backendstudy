@@ -40,6 +40,25 @@ public class ReplyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(replyService.saveReply(boardId, requestDto, member));
     }
 
+    @PostMapping("/boards/{boardId}/replies/{parentReplyId}/children")
+    public ResponseEntity<Long> createChildReply(
+            @PathVariable Long boardId,
+            @PathVariable Long parentReplyId,
+            @RequestBody ReplyRequestDto requestDto,
+            HttpSession session
+    ) {
+        Long loginMemberId = (Long) session.getAttribute("loginMemberId");
+
+        if (loginMemberId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Member member = memberService.findMember(loginMemberId);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(replyService.saveChildReply(boardId, parentReplyId, requestDto, member));
+    }
+
     @PutMapping("/replies/{replyId}")
     public ResponseEntity<Long> updateReply(
             @PathVariable Long replyId,

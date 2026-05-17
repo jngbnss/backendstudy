@@ -6,20 +6,57 @@
   <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a th:href="@{/boards}" class="brand">게시판</a>
+    <nav class="site-nav">
+      <a th:href="@{/boards}">목록</a>
+      <a th:if="${isLoggedIn}" th:href="@{/boards/my}">내 글</a>
+      <a th:if="${isLoggedIn}" th:href="@{/members/me}">프로필</a>
+      <button th:if="${isLoggedIn}" type="button" class="nav-button" onclick="logout()">로그아웃</button>
+      <a th:unless="${isLoggedIn}" th:href="@{/login}">로그인</a>
+      <a th:unless="${isLoggedIn}" th:href="@{/signup}">회원가입</a>
+    </nav>
+  </div>
+</header>
+
 <main class="page">
   <div class="topbar">
     <div>
-      <h1 class="page-title">게시글 목록</h1>
-      <p class="page-subtitle">작성된 글을 확인하고 새 글을 작성할 수 있습니다.</p>
-    </div>
-    <div class="actions">
-      <a th:if="${isLoggedIn}" th:href="@{/members/me}" class="btn btn-primary">프로필 수정</a>
-      <button th:if="${isLoggedIn}" type="button" class="btn btn-secondary" onclick="logout()">로그아웃</button>
-      <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn btn-primary">로그인</a>
-      <a th:unless="${isLoggedIn}" th:href="@{/signup}" class="btn btn-purple">회원가입</a>
-      <a th:href="@{/boards/write}" class="btn btn-success">글작성</a>
+      <h1 class="page-title" th:text="${pageTitle}">게시글 목록</h1>
+      <p class="page-subtitle">공지와 회원 게시글을 최신순, 날짜순, 조회순, 인기순으로 확인할 수 있습니다.</p>
     </div>
   </div>
+
+  <section class="list-tools">
+    <form class="search-form" th:action="${listPath}" method="get">
+      <input type="text" name="keyword" th:value="${keyword}" placeholder="제목 또는 내용 검색">
+      <input type="hidden" name="sort" th:value="${sort}">
+      <button type="submit" class="btn btn-primary">검색</button>
+      <a th:if="${keyword != null and !#strings.isEmpty(keyword)}"
+         th:href="${listPath + '?sort=' + sort}"
+         class="btn btn-secondary">초기화</a>
+      <a th:if="${isLoggedIn}" th:href="@{/boards/write}" class="btn btn-primary">글작성</a>
+    </form>
+    <p class="result-count">
+      총 <strong th:text="${boardPage.totalElements}">0</strong>개
+    </p>
+  </section>
+
+  <nav class="sort-tabs">
+    <a class="sort-tab"
+       th:classappend="${sort == 'latest'} ? ' active'"
+       th:href="${listPath + '?keyword=' + keyword + '&sort=latest'}">최신순</a>
+    <a class="sort-tab"
+       th:classappend="${sort == 'date'} ? ' active'"
+       th:href="${listPath + '?keyword=' + keyword + '&sort=date'}">날짜순</a>
+    <a class="sort-tab"
+       th:classappend="${sort == 'views'} ? ' active'"
+       th:href="${listPath + '?keyword=' + keyword + '&sort=views'}">조회순</a>
+    <a class="sort-tab"
+       th:classappend="${sort == 'popular'} ? ' active'"
+       th:href="${listPath + '?keyword=' + keyword + '&sort=popular'}">인기순</a>
+  </nav>
 
   <section class="panel table-wrap">
     <table class="table">
@@ -28,24 +65,117 @@
         <th>ID</th>
         <th>Title</th>
         <th>Writer</th>
+        <th>조회</th>
+        <th>좋아요</th>
+        <th>싫어요</th>
+        <th>작성일</th>
       </tr>
       </thead>
       <tbody>
       <tr th:if="${#lists.isEmpty(boards)}">
-        <td colspan="3" class="empty">아직 등록된 게시글이 없습니다.</td>
+        <td colspan="7" class="empty">아직 등록된 게시글이 없습니다.</td>
       </tr>
-      <tr th:each="board : ${boards}">
+      <tr th:each="board : ${boards}" th:classappend="${board.notice} ? ' notice-row'">
         <td th:text="${board.id}">1</td>
         <td>
+          <span th:if="${board.notice}" class="notice-badge">공지</span>
           <a class="title-link" th:href="@{/boards/{id}(id=${board.id})}" th:text="${board.title}">Title</a>
         </td>
-        <td th:text="${board.writer}">Writer</td>
+        <td>
+          <div class="writer-cell">
+            <span class="avatar avatar-tiny">
+              <img th:if="${board.writerProfileImageUrl != null and !#strings.isEmpty(board.writerProfileImageUrl)}"
+                   th:src="${board.writerProfileImageUrl}" alt="profile">
+              <span th:unless="${board.writerProfileImageUrl != null and !#strings.isEmpty(board.writerProfileImageUrl)}"
+                    th:text="${#strings.substring(board.writer, 0, 1)}">W</span>
+            </span>
+            <span th:text="${board.writer}">Writer</span>
+          </div>
+        </td>
+        <td th:text="${board.viewCount}">0</td>
+        <td th:text="${board.likeCount}">0</td>
+        <td th:text="${board.dislikeCount}">0</td>
+        <td class="time-cell"
+            th:text="${board.createdAt != null ? #temporals.format(board.createdAt, 'yyyy.MM.dd HH:mm') : '-'}">2026.05.16 14:32</td>
       </tr>
       </tbody>
     </table>
   </section>
+
+  <nav class="pagination" th:if="${boardPage.totalPages > 0}">
+    <a class="page-link"
+       th:classappend="${boardPage.first} ? ' disabled'"
+       th:href="${boardPage.first} ? 'javascript:void(0)' : ${listPath + '?page=' + (boardPage.number - 1) + '&keyword=' + keyword + '&sort=' + sort}">이전</a>
+
+    <a class="page-link"
+       th:each="pageNumber : ${#numbers.sequence(0, boardPage.totalPages - 1)}"
+       th:href="${listPath + '?page=' + pageNumber + '&keyword=' + keyword + '&sort=' + sort}"
+       th:classappend="${pageNumber == boardPage.number} ? ' active'"
+       th:text="${pageNumber + 1}">1</a>
+
+    <a class="page-link"
+       th:classappend="${boardPage.last} ? ' disabled'"
+       th:href="${boardPage.last} ? 'javascript:void(0)' : ${listPath + '?page=' + (boardPage.number + 1) + '&keyword=' + keyword + '&sort=' + sort}">다음</a>
+  </nav>
+
+  <form class="page-jump" th:if="${boardPage.totalPages > 0}" onsubmit="jumpToPage(event)">
+    <label for="pageNumber">페이지 이동</label>
+    <input type="number" id="pageNumber" min="1" th:max="${boardPage.totalPages}" th:value="${boardPage.number + 1}">
+    <span th:text="${' / ' + boardPage.totalPages}">/ 10</span>
+    <button type="submit" class="btn btn-secondary">이동</button>
+  </form>
 </main>
-<script>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <span>게시판</span>
+    <span>Spring Boot learning project</span>
+  </div>
+</footer>
+
+<script th:inline="javascript">
+  const listPath = /*[[${listPath}]]*/ '/boards';
+  const keyword = /*[[${keyword}]]*/ '';
+  const sort = /*[[${sort}]]*/ 'latest';
+  const currentPage = /*[[${boardPage.number}]]*/ 0;
+  const totalPages = /*[[${boardPage.totalPages}]]*/ 1;
+
+  function buildPageUrl(page) {
+      const params = new URLSearchParams();
+      params.set('page', page);
+      params.set('keyword', keyword);
+      params.set('sort', sort);
+      return `${listPath}?${params.toString()}`;
+  }
+
+  function jumpToPage(event) {
+      event.preventDefault();
+      const pageInput = document.getElementById('pageNumber');
+      const targetPage = Number(pageInput.value) - 1;
+
+      if (Number.isNaN(targetPage) || targetPage < 0 || targetPage >= totalPages) {
+          alert('이동할 수 없는 페이지입니다.');
+          return;
+      }
+
+      location.href = buildPageUrl(targetPage);
+  }
+
+  document.addEventListener('keydown', (event) => {
+      const tagName = event.target.tagName.toLowerCase();
+      if (tagName === 'input' || tagName === 'textarea') {
+          return;
+      }
+
+      if (event.key === 'ArrowLeft' && currentPage > 0) {
+          location.href = buildPageUrl(currentPage - 1);
+      }
+
+      if (event.key === 'ArrowRight' && currentPage < totalPages - 1) {
+          location.href = buildPageUrl(currentPage + 1);
+      }
+  });
+
   function logout() {
       fetch('/api/members/logout', {
           method: 'POST'

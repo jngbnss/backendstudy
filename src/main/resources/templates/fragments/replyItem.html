@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<li th:fragment="replyNode"
+    th:class="${replyItem.parentReplyId == null ? 'reply-item' : 'child-reply-item'}"
+    th:id="'reply-item-' + ${replyItem.id}">
+    <div class="reply-header">
+        <div class="avatar avatar-small">
+            <img th:if="${replyItem.writerProfileImageUrl != null and !#strings.isEmpty(replyItem.writerProfileImageUrl)}"
+                 th:src="${replyItem.writerProfileImageUrl}" alt="댓글 작성자 프로필">
+            <span th:unless="${replyItem.writerProfileImageUrl != null and !#strings.isEmpty(replyItem.writerProfileImageUrl)}"
+                  th:text="${#strings.substring(replyItem.writer, 0, 1)}">W</span>
+        </div>
+        <div>
+            <div class="reply-author" th:text="${replyItem.writer}">Writer</div>
+            <div class="reply-time"
+                 th:text="${replyItem.createdAt != null ? #temporals.format(replyItem.createdAt, 'yyyy.MM.dd HH:mm') : ''}">2026.05.16 14:32</div>
+        </div>
+    </div>
+
+    <p class="reply-text" th:id="'reply-text-' + ${replyItem.id}" th:text="${replyItem.content}">Reply content</p>
+
+    <div th:id="'edit-wrapper-' + ${replyItem.id}" class="edit-form">
+        <textarea th:id="'edit-content-' + ${replyItem.id}" th:text="${replyItem.content}"></textarea>
+        <div class="actions" style="justify-content: flex-start; margin-top: 8px;">
+            <button class="btn btn-success" th:onclick="updateReply([[${replyItem.id}]])">수정</button>
+            <button class="btn btn-secondary" th:onclick="toggleEdit([[${replyItem.id}]])">취소</button>
+        </div>
+    </div>
+
+    <div class="reply-actions" th:id="'reply-btns-' + ${replyItem.id}">
+        <a th:if="${isLoggedIn}" href="javascript:void(0)" class="text-link" th:onclick="toggleChildReply([[${replyItem.id}]])">답글</a>
+        <a th:if="${isLoggedIn and replyItem.writerId == loginMemberId}" href="javascript:void(0)" class="text-link" th:onclick="toggleEdit([[${replyItem.id}]])">수정</a>
+        <a th:if="${isLoggedIn and replyItem.writerId == loginMemberId}" href="javascript:void(0)" class="text-link text-link-danger" th:onclick="deleteReply([[${replyItem.id}]])">삭제</a>
+    </div>
+
+    <div th:id="'child-form-' + ${replyItem.id}" class="child-reply-form">
+        <textarea th:id="'child-content-' + ${replyItem.id}" placeholder="답글 내용을 입력하세요"></textarea>
+        <div class="actions" style="justify-content: flex-start; margin-top: 8px;">
+            <button class="btn btn-primary" th:onclick="submitChildReply([[${boardId}]], [[${replyItem.id}]])">답글작성</button>
+            <button class="btn btn-secondary" th:onclick="toggleChildReply([[${replyItem.id}]])">취소</button>
+        </div>
+    </div>
+
+    <ul class="child-reply-list" th:if="${!#lists.isEmpty(replyItem.childReplies)}">
+        <th:block th:each="childReply : ${replyItem.childReplies}" th:with="replyItem=${childReply}">
+            <li th:replace="~{fragments/replyItem :: replyNode}"></li>
+        </th:block>
+    </ul>
+</li>
+</body>
+</html>

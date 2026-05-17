@@ -52,3 +52,6 @@ data-init:
 #    hibernate:
 #      ddl-auto: update
 #    show-sql: true
+#
+#data-init:
+#  enabled: true
