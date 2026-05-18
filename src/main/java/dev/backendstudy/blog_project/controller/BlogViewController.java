@@ -34,7 +34,7 @@ public class BlogViewController {
             HttpSession session
     ) {
         int pageNumber = Math.max(page, 0);
-        var pageable = PageRequest.of(pageNumber, 10, createSort(sort));
+        var pageable = PageRequest.of(pageNumber, 20, createSort(sort));
         var boardPage = boardService.findPage(keyword, pageable);
 
         model.addAttribute("boardPage", boardPage);
@@ -61,7 +61,7 @@ public class BlogViewController {
         }
 
         int pageNumber = Math.max(page, 0);
-        var pageable = PageRequest.of(pageNumber, 10, createSort(sort));
+        var pageable = PageRequest.of(pageNumber, 20, createSort(sort));
         var boardPage = boardService.findMyPage(loginMemberId, keyword, pageable);
 
         model.addAttribute("boardPage", boardPage);
