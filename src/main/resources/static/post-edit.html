@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>글수정</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>글수정</h1>
+      <a class="btn" href="/index.html">목록</a>
+    </header>
+
+    <form id="post-form" class="form">
+      <label>제목
+        <input type="text" id="title" name="title" maxlength="200" required>
+      </label>
+      <label>작성자
+        <input type="text" id="author" name="author" maxlength="50" required>
+      </label>
+      <label>내용
+        <textarea id="content" name="content" rows="10" required></textarea>
+      </label>
+      <div class="form-actions">
+        <a id="cancel-link" class="btn" href="#">취소</a>
+        <button type="submit" class="btn btn-primary">수정</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="/js/edit.js"></script>
+</body>
+</html>

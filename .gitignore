@@ -41,3 +41,6 @@ out/
 
 ### Uploaded files ###
 uploads/
+
+### H2 file DB ###
+data/

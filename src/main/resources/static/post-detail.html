@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시글</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>게시글</h1>
+      <a class="btn" href="/index.html">목록</a>
+    </header>
+
+    <article class="post-detail">
+      <h2 id="title"></h2>
+      <div class="meta">
+        <span id="author"></span>
+        <span id="createdAt"></span>
+      </div>
+      <div id="content" class="content"></div>
+    </article>
+
+    <div class="form-actions">
+      <a id="edit-link" class="btn" href="#">수정</a>
+      <button id="delete-btn" class="btn btn-danger">삭제</button>
+    </div>
+  </div>
+
+  <script src="/js/detail.js"></script>
+</body>
+</html>

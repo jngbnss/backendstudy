@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.1' // 4.0.5는 아직 나오지 않은 버전입니다! 3.x대로 낮춰야 합니다.
+    id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -18,29 +18,25 @@ repositories {
 }
 
 dependencies {
-    // 1. 웹 및 JPA 핵심 라이브러리 (이름이 틀렸던 부분들 수정)
+    // 웹 + JPA
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // 2. DB 관련
+    // 입력값 검증 (@NotBlank 등)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // DB (학습용 H2)
     runtimeOnly 'com.h2database:h2'
 
-    // 3. 롬복
+    // 롬복
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-    // 4. 테스트 핵심 (이거 하나면 MockMvc, MockBean, JUnit 다 해결됩니다)
+    // 테스트
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
-    runtimeOnly 'com.mysql:mysql-connector-j'
-
-
-    implementation 'org.springframework.security:spring-security-crypto'
 }
 
 tasks.named('test') {

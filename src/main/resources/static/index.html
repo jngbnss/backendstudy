@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시판</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>게시판</h1>
+      <a class="btn btn-primary" href="/post-write.html">글쓰기</a>
+    </header>
+
+    <table class="post-table">
+      <thead>
+        <tr>
+          <th class="col-id">번호</th>
+          <th class="col-title">제목</th>
+          <th class="col-author">작성자</th>
+          <th class="col-date">작성일</th>
+        </tr>
+      </thead>
+      <tbody id="post-list"></tbody>
+    </table>
+
+    <p id="empty" class="empty" hidden>아직 게시글이 없습니다.</p>
+  </div>
+
+  <script src="/js/index.js"></script>
+</body>
+</html>
