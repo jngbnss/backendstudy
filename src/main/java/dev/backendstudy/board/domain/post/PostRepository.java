@@ -1,11 +1,19 @@
 package dev.backendstudy.board.domain.post;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+import java.util.Optional;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
+/**
+ * 저장소 인터페이스. 지금은 메모리 구현(MemoryPostRepository)을 쓰지만,
+ * 나중에 JPA/JDBC 구현으로 갈아끼울 수 있게 인터페이스로 분리.
+ */
+public interface PostRepository {
 
-    // 최신순 목록
-    List<Post> findAllByOrderByCreatedAtDesc();
+    Post save(Post post);
+
+    Optional<Post> findById(Long id);
+
+    List<Post> findAll();
+
+    void delete(Post post);
 }

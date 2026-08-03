@@ -2,23 +2,4 @@ spring:
   application:
     name: board
 
-  # 학습용 H2 (파일 모드 → 서버 재시작해도 글이 남음)
-  datasource:
-    url: jdbc:h2:file:./data/boarddb;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-  # http://localhost:8080/h2-console 로 DB 확인 가능
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+# DB 없음. 게시글은 메모리(Map)에 저장되며 서버 재시작 시 사라진다.

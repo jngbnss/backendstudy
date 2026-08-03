@@ -18,15 +18,11 @@ repositories {
 }
 
 dependencies {
-    // 웹 + JPA
+    // 웹 (순수 스프링 MVC, JPA/DB 없음 — 메모리 저장소 사용)
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     // 입력값 검증 (@NotBlank 등)
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // DB (학습용 H2)
-    runtimeOnly 'com.h2database:h2'
 
     // 롬복
     compileOnly 'org.projectlombok:lombok'
