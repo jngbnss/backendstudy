@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ramgstein
+
+  datasource:
+    url: jdbc:h2:mem:ramgstein
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
