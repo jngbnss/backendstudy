@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>램그스타인</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header>
+  <h1>램그스타인</h1>
+  <p class="tagline">망한 이야기를 모읍니다</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>실패 목록 <span id="count" class="count"></span></h2>
+    <ul id="post-list" class="post-list"></ul>
+    <p id="empty" class="empty">아직 아무도 망하지 않았다.</p>
+  </section>
+
+  <section class="card">
+    <h2>실패담 쓰기</h2>
+
+    <form id="post-form">
+      <label for="title">제목</label>
+      <input type="text" id="title" maxlength="100" placeholder="무엇이 망했나" required>
+
+      <label for="writer">작성자</label>
+      <input type="text" id="writer" maxlength="20" placeholder="닉네임 (20자 이내)" required>
+
+      <label for="content">내용</label>
+      <textarea id="content" rows="6" placeholder="어쩌다 그렇게 됐는지" required></textarea>
+
+      <button type="submit">등록</button>
+    </form>
+
+    <p id="message" class="message"></p>
+  </section>
+</main>
+
+<script src="/js/post.js"></script>
+</body>
+</html>
