@@ -39,14 +39,16 @@ Conventional Commits 기반.
 type(scope): subject
 ```
 
+subject는 한글로 작성한다.
+
 예시:
 
 ```text
-feat(post): add post create api
-fix(report): prevent duplicate report
-docs(api): add report api spec
-refactor(auth): split token provider
-test(post): add post service tests
+feat(post): 게시글 작성 API 추가
+fix(report): 중복 신고 방지
+docs(api): 신고 API 명세 추가
+refactor(auth): 토큰 프로바이더 분리
+test(post): 게시글 서비스 테스트 추가
 ```
 
 ### 타입
@@ -83,7 +85,9 @@ test(post): add post service tests
 
 ### Subject 규칙
 
-- 영어 소문자 동사로 시작
+- 한글로 작성
+- 무엇을 했는지 명사형 또는 `~ 추가/수정/삭제` 형태로 끝냄
+- `type(scope)` 부분은 영어 소문자 유지
 - 마침표 없음
 - 50자 이내 권장
 - 한 커밋은 한 목적만 포함
@@ -91,14 +95,17 @@ test(post): add post service tests
 좋은 예:
 
 ```text
-feat(category): add category request api
-feat(upload): add s3 presigned url api
+feat(category): 카테고리 신청 API 추가
+feat(upload): S3 presigned URL 발급 API 추가
+fix(like): 중복 좋아요 방지
+refactor(post): 생성자에서 타임스탬프 설정
 ```
 
 나쁜 예:
 
 ```text
 feat: 게시글도 만들고 로그인도 수정하고 이것저것 함
+feat(post): 게시글 작성 API를 추가했습니다.
 ```
 
 ## 3. Pull Request 규칙
